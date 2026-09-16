@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base-dominant: #101210;
+  --bg-surface-panel: #161816;
+  --bg-surface-raised: #1a1d1a;
+
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-accent-gold: #c2a145;
+  --border-muted-gold: rgba(194, 161, 69, 0.28);
+
+  --text-primary-high: #f3f2ee;
+  --text-secondary-mid: #a8a49a;
+
+  --status-sahih: #4ade80;
+  --status-hasan: #86efac;
+  --status-daif: #e0a33e;
+  --status-mawdu: #e06c5a;
+
+  --transition-smooth: color 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  --arabic-scale: 1;
+  --translation-scale: 1;
+  --layout-mode: stacked;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink-base text-parchment font-sans antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Card entrance: opacity only, no motion. */
+.hadith-card {
+  animation: fadeUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hadith-card {
+    animation: none;
+  }
+}
+
+::selection {
+  background: rgba(194, 161, 69, 0.35);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #101210;
+}
+::-webkit-scrollbar-thumb {
+  background: #242724;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2e332e;
+}
+
+@layer components {
+  /* Solid editorial panel: hairline border, flat fill. No blur, no glow. */
+  .panel {
+    @apply border border-hairline bg-ink-panel;
+  }
+
+  .arabic-text {
+    @apply font-arabic text-right leading-relaxed;
+    direction: rtl;
+    color: var(--text-primary-high);
+    font-size: calc(1.9rem * var(--arabic-scale));
+    line-height: 2.4;
+  }
+
+  .translation-text {
+    font-size: calc(1.1rem * var(--translation-scale));
+    line-height: 1.85;
+  }
+
+  .gold-rule {
+    height: 1px;
+    background: var(--border-muted-gold);
+  }
+
+  .search-highlight {
+    background: rgba(194, 161, 69, 0.3);
+    color: #fff;
+    padding: 0 2px;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-stone-mid transition-colors hover:bg-hover-wash hover:text-parchment;
+  }
+
+  .input-plain {
+    @apply w-full border border-hairline bg-ink-sunken px-4 py-2.5 text-parchment placeholder:text-stone-mid/60 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40 transition-colors duration-200;
+  }
+
+  .action-btn {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-mid transition-colors duration-200 hover:bg-hover-wash hover:text-parchment;
+  }
+}
