@@ -145,6 +145,23 @@ function AppShell() {
         <main id="main-content" className="flex flex-col gap-6">
           {view === "browse" && (
             <>
+              <section className="flex flex-wrap items-end justify-between gap-4 px-1 pt-1">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-gold">
+                    The living library
+                  </p>
+                  <h1 className="mt-2 max-w-2xl font-arabic text-3xl leading-tight text-parchment sm:text-4xl">
+                    Read with presence. Remember with purpose.
+                  </h1>
+                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-mid">
+                    Explore authenticated narrations in a calm, focused reading space built for reflection.
+                  </p>
+                </div>
+                <div className="hidden items-center gap-2 rounded-full border border-gold-muted bg-gold-faint px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gold sm:flex">
+                  <span className="h-2 w-2 rounded-full bg-mint-sahih shadow-[0_0_12px_rgba(101,213,155,.8)]" />
+                  Local index ready
+                </div>
+              </section>
               <HadithOfTheDay node={hod} onOpenReader={setReaderNode} />
 
               {/* Control bar */}

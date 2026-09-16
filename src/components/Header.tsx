@@ -33,11 +33,11 @@ export function Header({
         <div className="flex items-center gap-2.5">
           <Logomark />
           <div className="hidden leading-tight sm:block">
-            <p className="font-semibold tracking-wide text-parchment">
+            <p className="font-semibold tracking-[0.04em] text-parchment">
               Al-Muhaddith
             </p>
             <p className="text-[10px] uppercase tracking-[0.2em] text-gold">
-              Studio Hadith Reader
+              The living library
             </p>
           </div>
         </div>
