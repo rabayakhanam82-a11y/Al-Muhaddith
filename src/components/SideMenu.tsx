@@ -163,22 +163,6 @@ export function SideMenu({
             <span>Preservation History</span>
           </button>
 
-          {/* Quick Settings option in Nav Menu */}
-          <div className="pt-2">
-            <div className="my-2 border-t border-hairline" />
-            <button
-              onClick={() => {
-                onClose();
-                onOpenSettings?.();
-              }}
-              className={navButton(false)}
-              title="Reader settings"
-            >
-              <SettingsIcon />
-              <span className="flex-1">Settings</span>
-            </button>
-          </div>
-        
           <div className="pt-3">
             <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/80">
               Preferences
