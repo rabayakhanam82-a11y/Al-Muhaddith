@@ -4,9 +4,9 @@
 
 :root {
   --bg-base-dominant: #07130f;
-  --bg-surface-panel: rgba(14, 31, 24, 0.78);
+  --bg-surface-panel: #0e1f18;
   --bg-surface-raised: #122b21;
-  --bg-surface-soft: rgba(255, 255, 255, 0.045);
+  --bg-surface-sunken: #030d09;
   --border-hairline: rgba(213, 189, 114, 0.16);
   --border-accent-gold: #d6bb69;
   --border-muted-gold: rgba(214, 187, 105, 0.28);
@@ -16,6 +16,7 @@
   --status-hasan: #9ae6bd;
   --status-daif: #e5b563;
   --status-mawdu: #ed7d6d;
+
   --arabic-scale: 1;
   --translation-scale: 1;
   --layout-mode: stacked;
@@ -23,179 +24,110 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--bg-base-dominant); }
+
 body {
-  @apply font-sans antialiased;
+  @apply bg-ink-base font-sans antialiased;
   min-height: 100vh;
   overflow-x: hidden;
   color: var(--text-primary-high);
-  background:
-    radial-gradient(circle at 8% -5%, rgba(214, 187, 105, .16), transparent 27rem),
-    radial-gradient(circle at 93% 4%, rgba(35, 139, 94, .22), transparent 32rem),
-    linear-gradient(145deg, #06110d 0%, #091a13 52%, #07130f 100%);
 }
-body::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .23;
-  background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-  background-size: 44px 44px; mask-image: linear-gradient(to bottom, black, transparent 75%);
-}
+
 ::selection { background: rgba(214,187,105,.35); color: #fffdf1; }
+
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: #07130f; }
-::-webkit-scrollbar-thumb { background: #1f4938; border: 3px solid #07130f; border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: #1f4938; border: 3px solid #07130f; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #2a5c47; }
 
 @layer components {
+  /* Flat editorial panel: hairline border, solid fill, no radius, no shadow. */
   .panel {
-    @apply border;
+    @apply border bg-ink-panel;
     border-color: var(--border-hairline);
-    background: linear-gradient(145deg, rgba(20, 50, 38, .88), rgba(9, 25, 18, .88));
-    box-shadow: 0 18px 50px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.035);
-    border-radius: 18px;
   }
-  .arabic-text { @apply font-arabic text-right leading-relaxed; direction: rtl; color: var(--text-primary-high); font-size: calc(1.9rem * var(--arabic-scale)); line-height: 2.35; }
-  .translation-text { font-size: calc(1.1rem * var(--translation-scale)); line-height: 1.85; color: #d4ded6; }
-  .gold-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--border-muted-gold), transparent); }
-  .search-highlight { background: rgba(214,187,105,.3); color: #fff; padding: 0 2px; border-radius: 3px; }
-  .btn-ghost { @apply inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all; color: var(--text-secondary-mid); border-radius: 10px; }
-  .btn-ghost:hover { background: rgba(255,255,255,.07); color: var(--text-primary-high); }
-  .input-plain { @apply w-full px-4 py-2.5 transition-all; color: var(--text-primary-high); background: rgba(3, 13, 9, .68); border: 1px solid rgba(213,189,114,.18); border-radius: 12px; outline: none; }
+
+  .arabic-text {
+    @apply font-arabic text-right leading-relaxed;
+    direction: rtl;
+    color: var(--text-primary-high);
+    font-size: calc(1.9rem * var(--arabic-scale));
+    line-height: 2.35;
+    overflow-wrap: anywhere;
+  }
+
+  .translation-text {
+    font-size: calc(1.1rem * var(--translation-scale));
+    line-height: 1.85;
+    color: #d4ded6;
+    overflow-wrap: anywhere;
+  }
+
+  .gold-rule { height: 1px; background: var(--border-muted-gold); }
+
+  .search-highlight { background: rgba(214,187,105,.3); color: #fffdf1; padding: 0 2px; }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-stone-mid transition-colors duration-200 hover:bg-hover-wash hover:text-parchment;
+  }
+
+  .input-plain {
+    @apply w-full px-4 py-2.5 text-parchment transition-colors duration-200;
+    background: var(--bg-surface-sunken);
+    border: 1px solid rgba(213,189,114,.18);
+    outline: none;
+  }
   .input-plain::placeholder { color: #6e8b7d; }
-  .input-plain:focus { border-color: var(--border-accent-gold); box-shadow: 0 0 0 4px rgba(214,187,105,.1), 0 0 30px rgba(35,139,94,.12); }
-  .action-btn { @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all; color: var(--text-secondary-mid); border-radius: 8px; }
-  .action-btn:hover { color: var(--text-primary-high); background: rgba(255,255,255,.07); }
+  .input-plain:focus { border-color: var(--border-accent-gold); }
+
+  .action-btn {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-mid transition-colors duration-200 hover:bg-hover-wash hover:text-parchment;
+  }
 }
 
-/* Header */
-header.sticky { background: rgba(5, 18, 13, .76) !important; border-color: rgba(214,187,105,.15) !important; backdrop-filter: blur(18px); box-shadow: 0 12px 35px rgba(0,0,0,.16); }
-header.sticky > div { min-height: 76px; }
-header.sticky svg rect:first-child { fill: #0c241a; }
-header.sticky svg path, header.sticky svg rect:last-child { fill: #d6bb69; }
+/* Header: solid bar, hairline divider, no blur or shadow. */
+header.sticky {
+  background: var(--bg-base-dominant);
+  border-color: var(--border-hairline);
+}
 
-/* Navigation and collection rail */
-aside.panel { background: rgba(10, 30, 22, .72); border-color: rgba(214,187,105,.15); box-shadow: 0 16px 45px rgba(0,0,0,.16); }
-aside.panel button { border-radius: 10px; }
-aside.panel button:hover, aside.panel button[aria-current="page"] { background: linear-gradient(90deg, rgba(48,143,98,.2), rgba(214,187,105,.06)); }
+/* Cards: fade-in entrance, color-only hover. */
+.hadith-card {
+  animation: fadeUp .45s cubic-bezier(.4, 0, .2, 1) both;
+  transition: border-color .2s ease;
+}
+.hadith-card:hover { border-color: var(--border-muted-gold); }
+.hadith-card .arabic-text { font-size: calc(1.7rem * var(--arabic-scale)); }
 
-/* Hero */
-main > section[aria-label="Hadith of the Day"] { position: relative; overflow: hidden; min-height: 360px; border-left: 0 !important; background: radial-gradient(circle at 88% 20%, rgba(214,187,105,.17), transparent 17rem), linear-gradient(135deg, rgba(20,61,45,.97), rgba(7,25,17,.94)); }
-main > section[aria-label="Hadith of the Day"]::before { content: "۞"; position: absolute; right: 7%; top: 3%; font-family: Amiri, serif; font-size: 12rem; line-height: 1; color: rgba(214,187,105,.08); pointer-events: none; }
-main > section[aria-label="Hadith of the Day"]::after { content: ""; position: absolute; inset: 16px; border: 1px solid rgba(214,187,105,.12); border-radius: 12px; pointer-events: none; }
-main > section[aria-label="Hadith of the Day"] > * { position: relative; z-index: 1; }
-main > section[aria-label="Hadith of the Day"] .arabic-text { max-width: 900px; color: #fff8df; text-shadow: 0 3px 25px rgba(0,0,0,.25); }
-
-/* Feed cards */
-.hadith-card { animation: fadeUp .5s cubic-bezier(.23,1,.32,1) both; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
-.hadith-card:hover { transform: translateY(-3px); border-color: rgba(214,187,105,.35); box-shadow: 0 20px 55px rgba(0,0,0,.25), 0 0 0 1px rgba(214,187,105,.08); }
-.hadith-card .arabic-text { font-size: calc(1.7rem * var(--arabic-scale)); color: #f4efdd; }
-
-@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
-@media (max-width: 1023px) { header.sticky > div { min-height: 68px; } main > section[aria-label="Hadith of the Day"] { min-height: 320px; } }
-@media (max-width: 640px) { .panel { border-radius: 14px; } main > section[aria-label="Hadith of the Day"] { min-height: 300px; padding: 1.35rem !important; } main > section[aria-label="Hadith of the Day"]::before { font-size: 8rem; } .arabic-text { font-size: calc(1.55rem * var(--arabic-scale)); line-height: 2.05; } .hadith-card .arabic-text { font-size: calc(1.45rem * var(--arabic-scale)); } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hadith-card { animation: none; }
+  * { transition-duration: .01ms !important; }
+}
 
 /* Native controls */
 select { color-scheme: dark; }
 option { background: #0c2117; color: #f7f2df; }
-footer { color: #718d7e !important; }
+footer { color: #718d7e; letter-spacing: .02em; }
 button { cursor: pointer; }
-button:active { transform: scale(.98); }
 :focus-visible { outline: 2px solid #d6bb69; outline-offset: 3px; }
-.mantine, [data-radix-popper-content-wrapper] { z-index: 50; }
-@media (max-width: 1023px) { aside.panel { position: static; } }
-@media (min-width: 1024px) { main { min-width: 0; } }
-
-/* Make the small utility controls feel intentional with the new material language. */
-.border-hairline { border-color: var(--border-hairline) !important; }
-.bg-ink-panel { background: transparent !important; }
-.bg-ink-raised { background: #123124 !important; }
-.bg-ink-sunken { background: rgba(3, 13, 9, .68) !important; }
-.text-parchment { color: var(--text-primary-high) !important; }
-.text-stone-mid { color: var(--text-secondary-mid) !important; }
-.text-gold { color: #d6bb69 !important; }
-.border-gold-muted { border-color: var(--border-muted-gold) !important; }
-.bg-gold-faint { background: rgba(214,187,105,.09) !important; }
-.bg-hover-wash:hover { background: rgba(255,255,255,.07) !important; }
-.text-mint-sahih { color: var(--status-sahih) !important; }
-.text-crimson { color: var(--status-mawdu) !important; }
-.bg-mint-sahih { background: rgba(101,213,155,.12) !important; }
-.border-mint-sahih { border-color: rgba(101,213,155,.35) !important; }
-.bg-ochre { background: rgba(229,181,99,.12) !important; }
-.border-ochre { border-color: rgba(229,181,99,.35) !important; }
-.bg-crimson { background: rgba(237,125,109,.12) !important; }
-.border-crimson { border-color: rgba(237,125,109,.35) !important; }
-
-@media (max-width: 1023px) { .lg\:grid-cols-\[280px_1fr\] { grid-template-columns: 1fr !important; } }
-@media (min-width: 1024px) { .lg\:grid-cols-\[280px_1fr\] { grid-template-columns: 255px minmax(0, 1fr) !important; } }
-@media (min-width: 1280px) { .lg\:grid-cols-\[280px_1fr\] { grid-template-columns: 275px minmax(0, 1fr) !important; } }
-
-@media (max-width: 639px) { header.sticky .input-plain { font-size: .78rem; } header.sticky > div { gap: .55rem; } }
-
-/* Settings panel overlays should retain legibility over the textured shell. */
-.fixed.inset-0 { background: rgba(2, 10, 7, .7) !important; backdrop-filter: blur(8px); }
-.fixed.inset-0 .panel { box-shadow: 0 25px 90px rgba(0,0,0,.55); }
-
-@media (min-width: 1024px) { .lg\:sticky { top: 96px !important; } }
-
-@media (max-width: 1023px) { .sm\:px-6 { padding-left: 1rem !important; padding-right: 1rem !important; } }
-
-@media (max-width: 480px) { .top-search-box { min-width: 0; } }
-
-/* Prevent accidental clipping of long translations on narrow screens. */
-.translation-text { overflow-wrap: anywhere; }
-
-/* Quiet loading shimmer. */
-@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-[aria-hidden="true"] span, [aria-hidden="true"] div { background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(214,187,105,.10), rgba(255,255,255,.04)); background-size: 200% 100%; animation: shimmer 1.7s linear infinite; }
-@media (prefers-reduced-motion: reduce) { [aria-hidden="true"] span, [aria-hidden="true"] div { animation: none; } }
-
-@media print { body { background: white; color: black; } header, aside, footer, button { display: none !important; } .panel { box-shadow: none; border: 1px solid #ddd; } }
-
-/* The old utility names remain supported while the material system takes over. */
-@layer utilities { .text-balance { text-wrap: balance; } }
-
-/* mobile collection rail stays compact and scannable */
-@media (max-width: 1023px) { aside.panel { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .35rem; } aside.panel > p, aside.panel > .gold-rule, aside.panel > div:last-child { grid-column: 1 / -1; } }
-@media (max-width: 540px) { aside.panel { grid-template-columns: 1fr 1fr; padding: .8rem; } }
-
-/* Sidebar labels are separated visually from the controls on mobile. */
-aside.panel > p { letter-spacing: .22em; }
-
-/* Ensure links do not inherit browser blue in modal/library surfaces. */
 a { color: inherit; }
 
-/* Elegant small cap used by empty states and status notices. */
-.text-\[10px\] { letter-spacing: .16em; }
+/* Keep legacy utility class names legible under the flat system. */
+.border-hairline { border-color: var(--border-hairline); }
+.bg-ink-raised { background: var(--bg-surface-raised); }
+.bg-ink-sunken { background: var(--bg-base-dominant); }
+.bg-hover-wash:hover { background: rgba(255,255,255,.05); }
+.text-gold { color: var(--border-accent-gold); }
+.border-gold-muted { border-color: var(--border-muted-gold); }
+.bg-gold-faint { background: rgba(214,187,105,.09); }
 
-/* keep hero action visible above ornamental border */
-main > section[aria-label="Hadith of the Day"] button { position: relative; z-index: 2; }
+/* Long Arabic lines never bleed horizontally. */
+[role="dialog"] .arabic-text { overflow-wrap: anywhere; }
 
-/* card body spacing with the new rounded surfaces */
-.hadith-card > div { position: relative; z-index: 1; }
-
-/* Safari fallback for the decorative mask */
-@supports not (mask-image: linear-gradient(black, transparent)) { body::before { display: none; } }
-
-/* Respect app's dynamically applied type variables. */
-:root { transition: background-color .25s ease; }
-
-/* no horizontal bleed from the Arabic display */
-.arabic-text { overflow-wrap: anywhere; }
-
-/* shareable reader mode */
-[role="dialog"] .arabic-text { color: #fff8df; }
-
-/* Make footer feel like a quiet product signature. */
-footer { letter-spacing: .02em; }
-
-/* Avoid accidental selected text on chrome buttons. */
-button, select { user-select: none; }
-
-/* Final polish for the collection label line. */
-main > section[aria-label="Hadith of the Day"] .text-\[10px\] { color: #e3cb7c !important; }
-
-/* Stronger mobile touch targets. */
-@media (max-width: 640px) { button { min-height: 38px; } }
-
-/* Keep the app useful on ultra-wide monitors. */
-@media (min-width: 1600px) { main > section[aria-label="Hadith of the Day"] { min-height: 390px; } }
+/* Settings and menu overlays: flat dark scrim, no blur. */
+.fixed.inset-0 { background: rgba(2, 10, 7, .7); }
 
 /* End of visual system. */

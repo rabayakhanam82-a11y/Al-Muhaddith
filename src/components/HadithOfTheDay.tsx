@@ -58,7 +58,8 @@ export function HadithOfTheDay({
 
   const translationStrip = useMemo(() => {
     if (!node) return "";
-    const langs = node.translations
+    const shown = node.translations.filter((t) => t.text.trim());
+    const langs = shown
       .map((t) => LANGUAGE_LABELS[t.langCode] ?? t.langCode)
       .filter((label) => label !== "English");
     const extra = TRANSLATION_LANGUAGES.filter(
@@ -88,6 +89,8 @@ export function HadithOfTheDay({
 
   const collection = node.collection;
 
+  const translations = node.translations.filter((t) => t.text.trim());
+
   return (
     <section aria-label="Hadith of the Day" className="panel p-6 sm:p-8">
       <div className="flex flex-wrap items-center gap-3">
@@ -105,13 +108,13 @@ export function HadithOfTheDay({
         </span>
       </div>
 
-      {node.arabicText && (
+      {node.arabicText && node.arabicText.trim() && (
         <p className="arabic-text mt-6 text-[1.6rem] sm:text-[1.8rem]">
           {node.arabicText}
         </p>
       )}
 
-      {node.translations.map((t) => (
+      {translations.map((t) => (
         <div key={t.langCode} className="mt-5 first:mt-6">
           {t.langCode !== "eng" && node.translations.length > 1 && (
             <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">

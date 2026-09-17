@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { HadithNode } from "../types";
+import type { HadithNode, TranslationText } from "../types";
 import { useLibrary } from "../state/LibraryContext";
 import { HighlightedText } from "./HighlightedText";
 import { GradeBadge, GraderBadge } from "./GradeBadge";
@@ -19,6 +19,16 @@ interface HadithCardProps {
   searchQuery: string;
   onOpenReader?: (node: HadithNode) => void;
   index?: number;
+}
+
+/** Grade strings without letters (e.g. "-", "?") are junk and hidden. */
+function usableGrades(node: HadithNode) {
+  return node.grades.filter((g) => /[a-z]/i.test(g.grade ?? ""));
+}
+
+/** Non-empty translation blocks, primary order preserved. */
+function usableTranslations(node: HadithNode): TranslationText[] {
+  return node.translations.filter((t) => t.text && t.text.trim().length > 0);
 }
 
 export function HadithCard({
@@ -45,6 +55,11 @@ export function HadithCard({
     }
   };
 
+  const grades = usableGrades(node);
+  const translations = usableTranslations(node);
+  const hasArabic = Boolean(node.arabicText && node.arabicText.trim());
+  const textMissing = !hasArabic && translations.length === 0;
+
   const cardContent = (
     <>
       {/* Meta tray */}
@@ -56,62 +71,60 @@ export function HadithCard({
           {collection && <CollectionGlyph glyph={collection.glyph} size="sm" />}
           {node.sectionName}
         </span>
-        {node.translations.length > 1 && (
+        {translations.length > 1 && (
           <span
             className="inline-flex items-center gap-1 text-[11px] text-stone-mid"
-            title={node.translations.map((t) => LANGUAGE_LABELS[t.langCode] ?? t.langCode).join(", ")}
+            title={translations.map((t) => LANGUAGE_LABELS[t.langCode] ?? t.langCode).join(", ")}
           >
             <LanguageIcon size={13} />
-            {node.translations.length} languages
+            {translations.length} languages
           </span>
         )}
-        {node.grades.slice(0, 2).map((g, i) => (
+        {grades.slice(0, 2).map((g, i) => (
           <GradeBadge key={i} grade={g} />
         ))}
-        {node.grades.length > 2 && (
+        {grades.length > 2 && (
           <span className="text-[11px] text-stone-mid">
-            +{node.grades.length - 2} more
-          </span>
-        )}
-        {node.grades.length === 0 && (
-          <span className="border border-gold-muted bg-gold-faint px-2 py-0.5 text-[11px] font-medium text-gold">
-            Grade unspecified
+            +{grades.length - 2} more
           </span>
         )}
       </div>
 
       {/* Arabic block */}
-      {node.arabicText && (
+      {hasArabic && (
         <p className="arabic-text border-b border-hairline pb-4">
           {node.arabicText}
         </p>
       )}
 
       {/* Translation blocks: one block per active language, primary first */}
-      <div className="space-y-3">
-        {node.translations.map((t) => (
-          <div key={t.langCode}>
-            {node.translations.length > 1 && (
-              <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
-                {LANGUAGE_LABELS[t.langCode] ?? t.langCode}
-              </span>
-            )}
-            <p className="translation-text">
-              <HighlightedText text={t.text} query={searchQuery} />
-            </p>
-          </div>
-        ))}
-        {node.translations.length === 0 && node.translatedText && (
-          <p className="translation-text">
-            <HighlightedText text={node.translatedText} query={searchQuery} />
-          </p>
-        )}
-      </div>
+      {translations.length > 0 ? (
+        <div className="space-y-3">
+          {translations.map((t) => (
+            <div key={t.langCode}>
+              {translations.length > 1 && (
+                <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
+                  {LANGUAGE_LABELS[t.langCode] ?? t.langCode}
+                </span>
+              )}
+              <p className="translation-text">
+                <HighlightedText text={t.text} query={searchQuery} />
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="translation-text text-stone-mid/70">
+          {textMissing
+            ? "The text of this record is unavailable in the open edition. It remains listed here with its number and reference."
+            : node.translatedText}
+        </p>
+      )}
 
       {/* Grades detail row */}
-      {node.grades.length > 0 && (
+      {grades.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          {node.grades.map((g, i) => (
+          {grades.map((g, i) => (
             <GraderBadge key={i} grade={g} />
           ))}
         </div>

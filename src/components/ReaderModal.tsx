@@ -37,6 +37,14 @@ export function ReaderModal({
   const isBookmarked = bookmarks.has(node.id);
   const split = layoutMode === "split";
 
+  const translationList = (() => {
+    const usable = node.translations.filter((t) => t.text.trim());
+    if (usable.length > 0) return usable;
+    return node.translatedText.trim()
+      ? [{ langCode: "", text: node.translatedText }]
+      : [];
+  })();
+
   const translationBlock = (text: string, langCode?: string) => (
     <div>
       {langCode && node.translations.length > 1 && (
@@ -109,14 +117,18 @@ export function ReaderModal({
               )}
             </div>
             <div className="space-y-5">
-              {(node.translations.length
-                ? node.translations
-                : [{ langCode: "", text: node.translatedText }]
-              ).map((t, i) => (
-                <div key={t.langCode || i} className="border border-hairline bg-ink-sunken p-5">
-                  {translationBlock(t.text, t.langCode || undefined)}
-                </div>
-              ))}
+              {translationList.length > 0 ? (
+                translationList.map((t, i) => (
+                  <div key={t.langCode || i} className="border border-hairline bg-ink-sunken p-5">
+                    {translationBlock(t.text, t.langCode || undefined)}
+                  </div>
+                ))
+              ) : (
+                <p className="border border-hairline bg-ink-sunken p-5 text-sm text-stone-mid">
+                  Translation text unavailable for this record in the active
+                  languages.
+                </p>
+              )}
             </div>
           </div>
         ) : (
@@ -126,10 +138,7 @@ export function ReaderModal({
                 {node.arabicText}
               </p>
             )}
-            {(node.translations.length
-              ? node.translations
-              : [{ langCode: "", text: node.translatedText }]
-            ).map((t, i) => (
+            {translationList.map((t, i) => (
               <div key={t.langCode || i}>
                 {translationBlock(t.text, t.langCode || undefined)}
               </div>
