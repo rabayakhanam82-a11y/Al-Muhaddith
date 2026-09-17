@@ -98,24 +98,38 @@ export function HadithCard({
         </p>
       )}
 
-      {/* Translation blocks: distinguished container with gold accent border */}
+      {/* Translation blocks styled matching reference screenshot */}
       {translations.length > 0 ? (
         <div className="space-y-3">
-          {translations.map((t) => (
-            <div key={t.langCode} className="translation-container">
-              <div className="translation-label">
-                <LanguageIcon size={13} />
-                <span>{LANGUAGE_LABELS[t.langCode] ?? t.langCode}</span>
+          {translations.map((t, idx) => {
+            const isGold = t.langCode === "eng" || idx === 0;
+            const borderClass = isGold
+              ? "translation-card-gold"
+              : t.langCode === "ben"
+              ? "translation-card-emerald"
+              : "translation-card-teal";
+            const langLabel =
+              t.langCode === "eng"
+                ? "ENGLISH TRANSLATION"
+                : t.langCode === "ben"
+                ? "BENGALI - ABU BAKR ZAKARIA"
+                : `${(LANGUAGE_LABELS[t.langCode] ?? t.langCode).toUpperCase()} TRANSLATION`;
+
+            return (
+              <div key={t.langCode} className={borderClass}>
+                <div className="translation-header-title">
+                  <span>{langLabel}</span>
+                </div>
+                <p className="translation-body-text">
+                  <HighlightedText text={t.text} query={searchQuery} />
+                </p>
               </div>
-              <p className="translation-text">
-                <HighlightedText text={t.text} query={searchQuery} />
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
-        <div className="translation-container">
-          <p className="translation-text text-stone-mid">
+        <div className="translation-card-gold">
+          <p className="translation-body-text text-stone-mid">
             {textMissing
               ? "The text of this record is unavailable in the open edition. It remains listed here with its number and reference."
               : node.translatedText}

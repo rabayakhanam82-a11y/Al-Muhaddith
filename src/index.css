@@ -355,3 +355,42 @@ a { color: inherit; }
   header, footer, button { display: none !important; }
   .panel { box-shadow: none; border: 1px solid #ddd; }
 }
+
+  /* Screenshot-accurate translation card styling */
+  .translation-card-gold {
+    background: #0d2118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4.5px solid #d4af37 !important;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .translation-card-emerald {
+    background: #0d2118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4.5px solid #10b981 !important;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .translation-card-teal {
+    background: #0d2118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4.5px solid #14b8a6 !important;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .translation-header-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #e5b84c;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .translation-body-text {
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: #f8fafc;
+  }

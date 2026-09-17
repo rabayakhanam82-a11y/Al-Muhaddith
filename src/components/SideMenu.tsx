@@ -178,6 +178,24 @@ export function SideMenu({
               <span className="flex-1">Settings</span>
             </button>
           </div>
+        
+          <div className="pt-3">
+            <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/80">
+              Preferences
+            </p>
+            <button
+              onClick={() => {
+                onClose();
+                onOpenSettings?.();
+              }}
+              className={navButton(false)}
+              title="Reader settings"
+            >
+              <SettingsIcon size={16} />
+              <span className="flex-1 font-medium">Settings</span>
+            </button>
+          </div>
+
         </nav>
 
         <div className="border-t border-hairline pt-3 text-[11px] leading-relaxed text-stone-mid/70">

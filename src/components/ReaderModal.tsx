@@ -44,16 +44,31 @@ export function ReaderModal({
       : [];
   })();
 
-  const translationBlock = (text: string, langCode?: string) => (
-    <div className="translation-container">
-      {langCode && (
-        <div className="translation-label">
-          <span>{LANGUAGE_LABELS[langCode] ?? langCode}</span>
+    const translationBlock = (text: string, langCode?: string, idx: number = 0) => {
+    const isGold = !langCode || langCode === "eng" || idx === 0;
+    const borderClass = isGold
+      ? "translation-card-gold"
+      : langCode === "ben"
+      ? "translation-card-emerald"
+      : "translation-card-teal";
+    const langLabel =
+      langCode === "eng"
+        ? "ENGLISH TRANSLATION"
+        : langCode === "ben"
+        ? "BENGALI - ABU BAKR ZAKARIA"
+        : langCode
+        ? `${(LANGUAGE_LABELS[langCode] ?? langCode).toUpperCase()} TRANSLATION`
+        : "TRANSLATION";
+
+    return (
+      <div className={borderClass}>
+        <div className="translation-header-title">
+          <span>{langLabel}</span>
         </div>
-      )}
-      <p className="translation-text">{text}</p>
-    </div>
-  );
+        <p className="translation-body-text">{text}</p>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -118,9 +133,9 @@ export function ReaderModal({
             <div className="grid gap-8 md:grid-cols-2">
               <div className="order-2 border-t border-hairline pt-6 md:order-1 md:border-t-0 md:pt-0">
                 <div className="space-y-4">
-                  {translationList.map((t) => (
+                  {translationList.map((t, i) => (
                     <div key={t.langCode}>
-                      {translationBlock(t.text, t.langCode)}
+                      {translationBlock(t.text, t.langCode, i)}
                     </div>
                   ))}
                 </div>
@@ -137,9 +152,9 @@ export function ReaderModal({
                 </p>
               )}
               <div className="space-y-4">
-                {translationList.map((t) => (
+                {translationList.map((t, i) => (
                   <div key={t.langCode}>
-                    {translationBlock(t.text, t.langCode)}
+                    {translationBlock(t.text, t.langCode, i)}
                   </div>
                 ))}
               </div>
