@@ -98,16 +98,15 @@ export function HadithCard({
         </p>
       )}
 
-      {/* Translation blocks: one block per active language, primary first */}
+      {/* Translation blocks: distinguished container with gold accent border */}
       {translations.length > 0 ? (
-        <div className="space-y-3.5">
+        <div className="space-y-3">
           {translations.map((t) => (
-            <div key={t.langCode}>
-              {translations.length > 1 && (
-                <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/80">
-                  {LANGUAGE_LABELS[t.langCode] ?? t.langCode}
-                </span>
-              )}
+            <div key={t.langCode} className="translation-container">
+              <div className="translation-label">
+                <LanguageIcon size={13} />
+                <span>{LANGUAGE_LABELS[t.langCode] ?? t.langCode}</span>
+              </div>
               <p className="translation-text">
                 <HighlightedText text={t.text} query={searchQuery} />
               </p>
@@ -115,11 +114,13 @@ export function HadithCard({
           ))}
         </div>
       ) : (
-        <p className="translation-text text-stone-mid/70">
-          {textMissing
-            ? "The text of this record is unavailable in the open edition. It remains listed here with its number and reference."
-            : node.translatedText}
-        </p>
+        <div className="translation-container">
+          <p className="translation-text text-stone-mid">
+            {textMissing
+              ? "The text of this record is unavailable in the open edition. It remains listed here with its number and reference."
+              : node.translatedText}
+          </p>
+        </div>
       )}
 
       {/* Grades detail row */}

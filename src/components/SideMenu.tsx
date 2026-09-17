@@ -8,6 +8,7 @@ import {
   HistoryIcon,
   HomeIcon,
   MenuIcon,
+  SettingsIcon,
   XIcon,
 } from "./icons";
 
@@ -15,8 +16,7 @@ export type ViewKey = "home" | "browse" | "library" | "history";
 
 /**
  * Sliding left navigation drawer. Fixed overlay opened by the header's
- * hamburger (three-line menu) button; slides in from the left with an
- * overlay scrim.
+ * hamburger button; slides in from the left.
  */
 export function SideMenu({
   open,
@@ -25,6 +25,7 @@ export function SideMenu({
   onSelectView,
   activeCollection,
   onSelectCollection,
+  onOpenSettings,
 }: {
   open: boolean;
   onClose: () => void;
@@ -32,6 +33,7 @@ export function SideMenu({
   onSelectView: (view: ViewKey) => void;
   activeCollection: string;
   onSelectCollection: (key: string) => void;
+  onOpenSettings?: () => void;
 }) {
   const { bookmarks } = useLibrary();
 
@@ -62,14 +64,14 @@ export function SideMenu({
     <>
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/75"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-full w-full max-w-xs flex-col border-r border-hairline bg-ink-panel p-5 shadow-2xl backdrop-blur-xl transition-transform duration-300 ${
+        className={`fixed left-0 top-0 z-50 flex h-full w-full max-w-xs flex-col border-r border-hairline bg-ink-panel p-5 shadow-2xl transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
         role="dialog"
@@ -160,9 +162,25 @@ export function SideMenu({
             <HistoryIcon />
             <span>Preservation History</span>
           </button>
+
+          {/* Quick Settings option in Nav Menu */}
+          <div className="pt-2">
+            <div className="my-2 border-t border-hairline" />
+            <button
+              onClick={() => {
+                onClose();
+                onOpenSettings?.();
+              }}
+              className={navButton(false)}
+              title="Reader settings"
+            >
+              <SettingsIcon />
+              <span className="flex-1">Settings</span>
+            </button>
+          </div>
         </nav>
 
-        <div className="border-t border-hairline pt-3 text-[11px] leading-relaxed text-stone-mid/60">
+        <div className="border-t border-hairline pt-3 text-[11px] leading-relaxed text-stone-mid/70">
           The Living Hadith Library · Open authentic corpus
         </div>
       </aside>

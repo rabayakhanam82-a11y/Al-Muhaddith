@@ -45,11 +45,11 @@ export function ReaderModal({
   })();
 
   const translationBlock = (text: string, langCode?: string) => (
-    <div className="space-y-1">
-      {langCode && node.translations.length > 1 && (
-        <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/80">
-          {LANGUAGE_LABELS[langCode] ?? langCode}
-        </span>
+    <div className="translation-container">
+      {langCode && (
+        <div className="translation-label">
+          <span>{LANGUAGE_LABELS[langCode] ?? langCode}</span>
+        </div>
       )}
       <p className="translation-text">{text}</p>
     </div>
