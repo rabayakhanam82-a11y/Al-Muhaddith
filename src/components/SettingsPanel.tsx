@@ -32,13 +32,13 @@ export function SettingsPanel({
     <>
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/50"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
       <aside
-        className={`fixed right-0 top-0 z-50 h-full w-full max-w-sm overflow-y-auto border-l border-hairline bg-ink-panel p-6 transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-50 h-full w-full max-w-sm overflow-y-auto border-l border-hairline bg-ink-panel p-6 shadow-2xl backdrop-blur-xl transition-transform duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
@@ -59,9 +59,9 @@ export function SettingsPanel({
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
             Arabic Typography
           </p>
-          <label className="mb-1 flex items-center justify-between text-xs text-stone-mid">
+          <label className="mb-1.5 flex items-center justify-between text-xs text-stone-mid">
             <span>Script size</span>
-            <span className="text-parchment">×{arabicScale.toFixed(2)}</span>
+            <span className="font-mono text-parchment">×{arabicScale.toFixed(2)}</span>
           </label>
           <input
             type="range"
@@ -70,15 +70,15 @@ export function SettingsPanel({
             step={0.05}
             value={arabicScale}
             onChange={(e) => setArabicScale(Number(e.target.value))}
-            className="w-full accent-gold"
+            className="w-full accent-gold cursor-pointer"
           />
 
           <p className="mb-3 mt-6 text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
             Translation Typography
           </p>
-          <label className="mb-1 flex items-center justify-between text-xs text-stone-mid">
+          <label className="mb-1.5 flex items-center justify-between text-xs text-stone-mid">
             <span>Text size</span>
-            <span className="text-parchment">
+            <span className="font-mono text-parchment">
               ×{translationScale.toFixed(2)}
             </span>
           </label>
@@ -89,7 +89,7 @@ export function SettingsPanel({
             step={0.05}
             value={translationScale}
             onChange={(e) => setTranslationScale(Number(e.target.value))}
-            className="w-full accent-gold"
+            className="w-full accent-gold cursor-pointer"
           />
         </section>
 
@@ -103,10 +103,10 @@ export function SettingsPanel({
               <button
                 key={mode}
                 onClick={() => setLayoutMode(mode)}
-                className={`border px-3 py-2.5 text-xs font-medium transition-colors duration-200 ${
+                className={`rounded-lg border px-3 py-2.5 text-xs font-medium transition-all duration-200 ${
                   layoutMode === mode
-                    ? "border-gold bg-gold-faint text-gold"
-                    : "border-hairline text-stone-mid hover:text-parchment"
+                    ? "border-gold bg-gold-faint text-gold shadow-sm"
+                    : "border-hairline text-stone-mid hover:border-gold-muted hover:text-parchment"
                 }`}
               >
                 {mode === "split" ? "Side-by-side" : "Stacked"}
@@ -146,10 +146,10 @@ export function SettingsPanel({
                 <div key={l.code} className="relative">
                   <button
                     onClick={() => (active ? setLangCode(l.code) : toggleLangCode(l.code))}
-                    className={`w-full border px-3 py-2.5 pr-8 text-left text-xs font-medium transition-colors duration-200 ${
+                    className={`w-full rounded-lg border px-3 py-2.5 pr-8 text-left text-xs font-medium transition-all duration-200 ${
                       active
-                        ? "border-gold bg-gold-faint text-gold"
-                        : "border-hairline text-stone-mid hover:text-parchment"
+                        ? "border-gold bg-gold-faint text-gold shadow-sm"
+                        : "border-hairline text-stone-mid hover:border-gold-muted hover:text-parchment"
                     }`}
                     title={
                       active
@@ -165,7 +165,7 @@ export function SettingsPanel({
                     <>
                       {isPrimary && (
                         <span
-                          className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-bold uppercase text-gold"
+                          className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded bg-gold/20 px-1 py-0.5 text-[9px] font-bold uppercase text-gold"
                           title="Primary translation language"
                         >
                           P
@@ -174,7 +174,7 @@ export function SettingsPanel({
                       {!isPrimary && langCodes.length > 1 && (
                         <button
                           onClick={() => toggleLangCode(l.code)}
-                          className="absolute right-1.5 top-1/2 -translate-y-1/2 text-stone-mid hover:text-crimson"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-stone-mid hover:bg-crimson/20 hover:text-crimson"
                           title={`Remove ${l.label}`}
                           aria-label={`Remove ${l.label} translation`}
                         >

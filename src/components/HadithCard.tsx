@@ -5,6 +5,7 @@ import { HighlightedText } from "./HighlightedText";
 import { GradeBadge, GraderBadge } from "./GradeBadge";
 import {
   BookmarkFilledIcon,
+  BookmarkIcon,
   CollectionGlyph,
   ExternalLinkIcon,
   EyeIcon,
@@ -64,7 +65,7 @@ export function HadithCard({
     <>
       {/* Meta tray */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="border border-gold-muted bg-gold-faint px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gold">
+        <span className="rounded-md border border-gold-muted bg-gold-faint px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-gold shadow-sm">
           No. {node.hadithNumber}
         </span>
         <span className="hidden items-center gap-1.5 truncate text-xs text-stone-mid sm:flex">
@@ -73,7 +74,7 @@ export function HadithCard({
         </span>
         {translations.length > 1 && (
           <span
-            className="inline-flex items-center gap-1 text-[11px] text-stone-mid"
+            className="inline-flex items-center gap-1 rounded-md border border-hairline bg-ink-sunken/60 px-2 py-0.5 text-[11px] text-stone-mid"
             title={translations.map((t) => LANGUAGE_LABELS[t.langCode] ?? t.langCode).join(", ")}
           >
             <LanguageIcon size={13} />
@@ -84,7 +85,7 @@ export function HadithCard({
           <GradeBadge key={i} grade={g} />
         ))}
         {grades.length > 2 && (
-          <span className="text-[11px] text-stone-mid">
+          <span className="rounded-md border border-hairline bg-ink-sunken/60 px-2 py-0.5 text-[11px] text-stone-mid">
             +{grades.length - 2} more
           </span>
         )}
@@ -92,18 +93,18 @@ export function HadithCard({
 
       {/* Arabic block */}
       {hasArabic && (
-        <p className="arabic-text border-b border-hairline pb-4">
+        <p className="arabic-text border-b border-hairline pb-4 pt-1">
           {node.arabicText}
         </p>
       )}
 
       {/* Translation blocks: one block per active language, primary first */}
       {translations.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {translations.map((t) => (
             <div key={t.langCode}>
               {translations.length > 1 && (
-                <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
+                <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/80">
                   {LANGUAGE_LABELS[t.langCode] ?? t.langCode}
                 </span>
               )}
@@ -123,7 +124,7 @@ export function HadithCard({
 
       {/* Grades detail row */}
       {grades.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
           {grades.map((g, i) => (
             <GraderBadge key={i} grade={g} />
           ))}
@@ -131,7 +132,7 @@ export function HadithCard({
       )}
 
       {/* Action tray */}
-      <div className="mt-1 flex items-center justify-between border-t border-hairline pt-3">
+      <div className="mt-2 flex items-center justify-between border-t border-hairline pt-3">
         <div className="flex items-center gap-1.5 text-xs text-stone-mid">
           <span className="opacity-70">
             <EyeIcon />
@@ -146,13 +147,7 @@ export function HadithCard({
             aria-pressed={isBookmarked}
             title={isBookmarked ? "Remove bookmark" : "Bookmark this narration"}
           >
-            {isBookmarked ? (
-              <BookmarkFilledIcon />
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-              </svg>
-            )}
+            {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon size={15} />}
             <span className="hidden sm:inline">
               {isBookmarked ? "Saved" : "Bookmark"}
             </span>
@@ -169,7 +164,7 @@ export function HadithCard({
             </button>
 
             {menuOpen && (
-              <div className="panel absolute bottom-full right-0 z-20 mb-2 w-56 bg-ink-raised p-2">
+              <div className="panel absolute bottom-full right-0 z-20 mb-2 w-56 rounded-xl border border-hairline bg-ink-raised p-2 shadow-2xl backdrop-blur-md">
                 <p className="px-2 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-widest text-stone-mid">
                   Add to playlist
                 </p>
@@ -191,7 +186,7 @@ export function HadithCard({
                           }
                           setMenuOpen(false);
                         }}
-                        className="flex w-full items-center justify-between px-2 py-1.5 text-left text-xs text-parchment transition-colors duration-200 hover:bg-hover-wash"
+                        className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-xs text-parchment transition-colors duration-200 hover:bg-hover-wash"
                       >
                         <span className="truncate">{pl.name}</span>
                         {inList && (
@@ -216,7 +211,7 @@ export function HadithCard({
           {onOpenReader && (
             <button
               onClick={() => onOpenReader(node)}
-              className="action-btn text-gold"
+              className="action-btn text-gold hover:text-parchment"
               title="Open focused reader"
             >
               <ExternalLinkIcon />

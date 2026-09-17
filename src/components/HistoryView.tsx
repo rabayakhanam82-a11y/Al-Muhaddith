@@ -14,7 +14,7 @@ export function HistoryView() {
 
   return (
     <div className="space-y-8">
-      <section className="panel border-l-2 border-l-gold p-6 sm:p-8">
+      <section className="panel border-l-4 border-l-gold p-6 sm:p-8">
         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Epistemological History
         </p>
@@ -38,10 +38,10 @@ export function HistoryView() {
               setEraIndex(i);
               setHubIndex(0);
             }}
-            className={`border px-4 py-2 text-xs font-semibold transition-colors duration-200 ${
+            className={`rounded-lg border px-4 py-2 text-xs font-semibold transition-all duration-200 ${
               eraIndex === i
-                ? "border-gold bg-gold-faint text-gold"
-                : "border-hairline text-stone-mid hover:text-parchment"
+                ? "border-gold bg-gold-faint text-gold shadow-sm"
+                : "border-hairline text-stone-mid hover:border-gold-muted hover:text-parchment"
             }`}
           >
             {e.epoch}
@@ -59,13 +59,13 @@ export function HistoryView() {
             <div key={h.id} className="timeline-node relative pb-8">
               <span
                 aria-hidden="true"
-                className="absolute -left-[37px] top-1 h-2.5 w-2.5 bg-gold"
+                className="absolute -left-[37px] top-1.5 h-2.5 w-2.5 rounded-full bg-gold shadow-sm"
               />
               <button
                 onClick={() => setHubIndex(i)}
                 className="text-left"
               >
-                <p className="timeline-title font-semibold text-gold">
+                <p className="timeline-title font-semibold text-gold hover:underline">
                   {h.city} · {h.region}
                 </p>
                 <p className="text-[11px] uppercase tracking-wider text-stone-mid/70">
@@ -74,7 +74,7 @@ export function HistoryView() {
               </button>
 
               {hubIndex === i && (
-                <div className="mt-3">
+                <div className="mt-3 rounded-xl border border-hairline bg-ink-sunken/60 p-4">
                   <p className="text-sm font-semibold text-parchment">
                     {h.headline}
                   </p>
@@ -85,7 +85,7 @@ export function HistoryView() {
                     {h.scholars.map((s) => (
                       <span
                         key={s}
-                        className="border border-hairline bg-ink-sunken px-2.5 py-0.5 text-[11px] text-stone-mid"
+                        className="rounded-md border border-hairline bg-ink-sunken px-2.5 py-0.5 text-[11px] font-medium text-stone-mid"
                       >
                         {s}
                       </span>
@@ -105,7 +105,7 @@ export function HistoryView() {
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
           {SCHOLAR_METHODS.map((m) => (
-            <div key={m.id} className="border border-hairline bg-ink-sunken p-5">
+            <div key={m.id} className="rounded-xl border border-hairline bg-ink-sunken p-5 transition-all hover:border-gold-muted">
               <h3 className="font-semibold text-gold">{m.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-stone-mid">
                 {m.body}
@@ -140,7 +140,7 @@ function ReadingTrail() {
       {history.slice(0, 12).map((h) => (
         <li
           key={h.id}
-          className="flex items-center justify-between bg-black/20 px-4 py-2.5 text-sm"
+          className="flex items-center justify-between rounded-lg bg-black/20 px-4 py-2.5 text-sm"
         >
           <span className="truncate text-stone-mid">
             {h.collectionKey}-{h.id.split("-").slice(1).join("-")}

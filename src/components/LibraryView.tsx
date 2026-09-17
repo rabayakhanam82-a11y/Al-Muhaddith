@@ -48,14 +48,14 @@ export function LibraryView({
         </h2>
 
         {bookmarkList.length === 0 ? (
-          <p className="mt-4 border border-dashed border-hairline p-6 text-center text-sm text-stone-mid">
+          <p className="mt-4 rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-stone-mid">
             Nothing saved yet. Tap the bookmark on any narration to keep it
             here, stored locally and always available offline.
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
             {bookmarkList.map((bm) => (
-              <li key={bm.id} className="border border-hairline bg-ink-sunken p-4">
+              <li key={bm.id} className="rounded-xl border border-hairline bg-ink-sunken p-4 transition-all hover:border-gold-muted">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="mb-1.5 flex flex-wrap items-center gap-2">
@@ -66,7 +66,7 @@ export function LibraryView({
                         }
                         size="sm"
                       />
-                      <span className="border border-gold-muted bg-gold-faint px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold">
+                      <span className="rounded-md border border-gold-muted bg-gold-faint px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold">
                         {bm.collectionKey} · {bm.hadithNumber}
                       </span>
                       {bm.node?.grades?.slice(0, 1).map((g, i) => (
@@ -94,23 +94,24 @@ export function LibraryView({
                         Read
                       </button>
                     )}
-                    <button                        onClick={() =>
-                          void toggleBookmark(
-                            bm.node ?? {
-                              id: bm.id,
-                              hadithNumber: bm.hadithNumber,
-                              arabicText: "",
-                              translatedText: bm.snippet,
-                              translations: [],
-                              collection: bm.collectionKey,
-                              sectionId: 0,
-                              sectionName: "",
-                              bookTitle: "",
-                              grades: [],
-                            },
-                          )
-                        }
-                      className="btn-ghost text-xs text-crimson"
+                    <button
+                      onClick={() =>
+                        void toggleBookmark(
+                          bm.node ?? {
+                            id: bm.id,
+                            hadithNumber: bm.hadithNumber,
+                            arabicText: "",
+                            translatedText: bm.snippet,
+                            translations: [],
+                            collection: bm.collectionKey,
+                            sectionId: 0,
+                            sectionName: "",
+                            bookTitle: "",
+                            grades: [],
+                          },
+                        )
+                      }
+                      className="btn-ghost text-xs text-crimson hover:bg-crimson/10"
                       title="Remove bookmark"
                     >
                       Remove
@@ -138,21 +139,21 @@ export function LibraryView({
           />
           <button
             onClick={() => void handleCreate()}
-            className="border border-gold bg-gold-faint px-4 py-2 text-sm font-semibold text-gold transition-colors duration-200 hover:bg-gold-muted"
+            className="rounded-xl border border-gold bg-gold-faint px-5 py-2 text-sm font-semibold text-gold transition-colors duration-200 hover:bg-gold-muted hover:text-parchment"
           >
             Create
           </button>
         </div>
 
         {playlists.length === 0 ? (
-          <p className="mt-4 border border-dashed border-hairline p-6 text-center text-sm text-stone-mid">
+          <p className="mt-4 rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-stone-mid">
             Group narrations into named collections: study circles, khutbah
             prep, personal themes.
           </p>
         ) : (
           <ul className="mt-4 space-y-2">
             {playlists.map((pl) => (
-              <li key={pl.id} className="border border-hairline bg-ink-sunken">
+              <li key={pl.id} className="rounded-xl border border-hairline bg-ink-sunken overflow-hidden">
                 <div className="flex items-center justify-between gap-3 p-4">
                   <button
                     onClick={() =>
@@ -164,13 +165,13 @@ export function LibraryView({
                       {openPlaylistId === pl.id ? "▾" : "▸"}
                     </span>
                     <span className="font-medium text-parchment">{pl.name}</span>
-                    <span className="bg-gold-faint px-2 py-0.5 text-[10px] font-semibold text-gold">
+                    <span className="rounded-full bg-gold-faint px-2 py-0.5 text-[10px] font-semibold text-gold">
                       {pl.hadithIds.length}
                     </span>
                   </button>
                   <button
                     onClick={() => void deletePlaylistById(pl.id)}
-                    className="btn-ghost text-xs text-crimson"
+                    className="btn-ghost text-xs text-crimson hover:bg-crimson/10"
                   >
                     Delete
                   </button>
@@ -185,7 +186,7 @@ export function LibraryView({
                           return (
                             <li
                               key={hid}
-                              className="flex items-center justify-between gap-3 bg-black/20 px-3 py-2"
+                              className="flex items-center justify-between gap-3 rounded-lg bg-black/30 px-3 py-2"
                             >
                               <span className="min-w-0 flex-1 truncate text-sm text-stone-mid">
                                 <HighlightedText
@@ -197,7 +198,7 @@ export function LibraryView({
                                 onClick={() =>
                                   void removeFromPlaylist(pl.id, hid)
                                 }
-                                className="btn-ghost text-xs text-crimson"
+                                className="btn-ghost text-xs text-crimson hover:bg-crimson/10"
                               >
                                 Remove
                               </button>

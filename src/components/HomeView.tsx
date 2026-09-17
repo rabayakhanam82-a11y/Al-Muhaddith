@@ -49,7 +49,7 @@ export function HomeView({
         </p>
 
         {/* Quick search */}
-        <div className="mt-6 flex max-w-xl items-stretch">
+        <div className="mt-6 flex max-w-xl items-stretch gap-2">
           <div className="relative flex-1">
             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-mid">
               <SearchIcon />
@@ -66,7 +66,7 @@ export function HomeView({
           </div>
           <button
             onClick={submitSearch}
-            className="ml-2 border border-gold bg-gold-faint px-5 text-sm font-semibold text-gold transition-colors duration-200 hover:bg-gold-muted"
+            className="rounded-xl border border-gold bg-gold-faint px-5 text-sm font-semibold text-gold transition-all duration-200 hover:bg-gold-muted hover:text-parchment active:scale-[0.98]"
           >
             Search
           </button>
@@ -93,7 +93,7 @@ export function HomeView({
               <select
                 value={book}
                 onChange={(e) => setBook(e.target.value)}
-                className="input-plain appearance-none pr-9"
+                className="input-plain appearance-none pr-9 font-medium"
                 aria-label="Select book"
               >
                 {COLLECTIONS.map((c) => (
@@ -120,7 +120,7 @@ export function HomeView({
               onChange={(e) => setHadithNo(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && onQuickRead(book, hadithNo.trim())}
               placeholder="e.g. 1"
-              className="input-plain"
+              className="input-plain font-mono"
               aria-label="Hadith number"
             />
           </label>
@@ -139,10 +139,10 @@ export function HomeView({
                     onClick={() => toggleLangCode(l.code)}
                     aria-pressed={active}
                     title={active ? `Hide ${l.label}` : `Show ${l.label}`}
-                    className={`border px-2.5 py-1.5 text-xs font-medium transition-colors duration-200 ${
+                    className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-200 ${
                       active
-                        ? "border-gold bg-gold-faint text-gold"
-                        : "border-hairline text-stone-mid hover:text-parchment"
+                        ? "border-gold bg-gold-faint text-gold shadow-sm"
+                        : "border-hairline text-stone-mid hover:border-gold-muted hover:text-parchment"
                     }`}
                   >
                     {l.label}
@@ -156,7 +156,7 @@ export function HomeView({
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <button
             onClick={() => onQuickRead(book, hadithNo.trim())}
-            className="border border-gold bg-gold-faint px-5 py-2.5 text-sm font-semibold text-gold transition-colors duration-200 hover:bg-gold-muted"
+            className="rounded-xl border border-gold bg-gold-faint px-5 py-2.5 text-sm font-semibold text-gold transition-all duration-200 hover:bg-gold-muted hover:text-parchment active:scale-[0.98]"
           >
             {hadithNo.trim() ? "Open hadith" : "Open book"}
           </button>
