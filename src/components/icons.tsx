@@ -1,84 +1,101 @@
-export function Search() {
+/**
+ * Icon system: real downloaded SVG assets (Tabler outline set, MIT) imported
+ * raw and inlined, so every glyph is a hand-checked vector file in
+ * src/assets/icons rather than CSS drawings or emojis.
+ */
+import menuSvg from "../assets/icons/menu-2.svg?raw";
+import searchSvg from "../assets/icons/search.svg?raw";
+import homeSvg from "../assets/icons/home.svg?raw";
+import bookSvg from "../assets/icons/book-2.svg?raw";
+import bookmarkSvg from "../assets/icons/bookmark.svg?raw";
+import historySvg from "../assets/icons/history.svg?raw";
+import settingsSvg from "../assets/icons/settings.svg?raw";
+import xSvg from "../assets/icons/x.svg?raw";
+import chevronDownSvg from "../assets/icons/chevron-down.svg?raw";
+import arrowRightSvg from "../assets/icons/arrow-right.svg?raw";
+import languageSvg from "../assets/icons/language.svg?raw";
+import eyeSvg from "../assets/icons/eye.svg?raw";
+import bookmarkFilledSvg from "../assets/icons/bookmark-filled.svg?raw";
+import foldersSvg from "../assets/icons/folders.svg?raw";
+import linkSvg from "../assets/icons/link.svg?raw";
+import externalLinkSvg from "../assets/icons/external-link.svg?raw";
+
+/** Inlines a downloaded SVG source with a configurable pixel size. */
+function Svg({ src, size }: { src: string; size: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.35-4.35" />
-    </svg>
+    <span
+      aria-hidden="true"
+      className="inline-flex shrink-0 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
+      style={{ width: size, height: size }}
+      dangerouslySetInnerHTML={{ __html: src }}
+    />
   );
 }
 
-export function BookIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-    </svg>
-  );
+type IconProps = { size?: number };
+
+export function MenuIcon({ size = 20 }: IconProps) {
+  return <Svg src={menuSvg} size={size} />;
 }
 
-export function LayersIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m12 2 10 5-10 5L2 7z" />
-      <path d="m2 17 10 5 10-5" />
-      <path d="m2 12 10 5 10-5" />
-    </svg>
-  );
+export function SearchIcon({ size = 16 }: IconProps) {
+  return <Svg src={searchSvg} size={size} />;
 }
 
-export function HistoryIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 3v5h5" />
-      <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8" />
-      <path d="M12 7v5l4 2" />
-    </svg>
-  );
+export function HomeIcon({ size = 18 }: IconProps) {
+  return <Svg src={homeSvg} size={size} />;
 }
 
-export function CompassIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-    </svg>
-  );
+export function BookIcon({ size = 18 }: IconProps) {
+  return <Svg src={bookSvg} size={size} />;
 }
 
-export function BookmarkIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-    </svg>
-  );
+export function BookmarkIcon({ size = 18 }: IconProps) {
+  return <Svg src={bookmarkSvg} size={size} />;
 }
 
-export function XIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
+export function HistoryIcon({ size = 18 }: IconProps) {
+  return <Svg src={historySvg} size={size} />;
 }
 
-export function ExternalLinkIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M15 3h6v6" />
-      <path d="M10 14L21 3" />
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-    </svg>
-  );
+export function SettingsIcon({ size = 16 }: IconProps) {
+  return <Svg src={settingsSvg} size={size} />;
 }
 
-export function ArrowRightIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  );
+export function XIcon({ size = 16 }: IconProps) {
+  return <Svg src={xSvg} size={size} />;
+}
+
+export function ChevronDownIcon({ size = 14 }: IconProps) {
+  return <Svg src={chevronDownSvg} size={size} />;
+}
+
+export function ArrowRightIcon({ size = 14 }: IconProps) {
+  return <Svg src={arrowRightSvg} size={size} />;
+}
+
+export function LanguageIcon({ size = 18 }: IconProps) {
+  return <Svg src={languageSvg} size={size} />;
+}
+
+export function EyeIcon({ size = 14 }: IconProps) {
+  return <Svg src={eyeSvg} size={size} />;
+}
+
+export function BookmarkFilledIcon({ size = 15 }: IconProps) {
+  return <Svg src={bookmarkFilledSvg} size={size} />;
+}
+
+export function FoldersIcon({ size = 15 }: IconProps) {
+  return <Svg src={foldersSvg} size={size} />;
+}
+
+export function LinkIcon({ size = 15 }: IconProps) {
+  return <Svg src={linkSvg} size={size} />;
+}
+
+export function ExternalLinkIcon({ size = 15 }: IconProps) {
+  return <Svg src={externalLinkSvg} size={size} />;
 }
 
 /**

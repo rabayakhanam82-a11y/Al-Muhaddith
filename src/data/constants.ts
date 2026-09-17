@@ -27,7 +27,7 @@ export const PAGE_SIZE = 50;
 
 export const SEARCH_DEBOUNCE_MS = 350;
 
-/** The six canonical collections surfaced in the sidebar. */
+/** The six canonical collections surfaced in the side menu. */
 export const COLLECTIONS: CollectionInfo[] = [
   {
     key: "bukhari",
@@ -67,15 +67,25 @@ export const COLLECTIONS: CollectionInfo[] = [
   },
 ];
 
+/**
+ * Translation languages shipped by the fawazahmed0/hadith-api CDN
+ * (verified against editions.json). Multiple can be active at once.
+ */
 export const TRANSLATION_LANGUAGES = [
   { code: "eng", label: "English" },
-  { code: "ben", label: "Bengali" },
-  { code: "ind", label: "Indonesian" },
-  { code: "fra", label: "French" },
-  { code: "deu", label: "German" },
-  { code: "tur", label: "Turkish" },
-  { code: "rus", label: "Russian" },
-  { code: "spa", label: "Spanish" },
   { code: "urd", label: "Urdu" },
-  { code: "mlu", label: "Malayalam" },
+  { code: "ben", label: "Bengali" },
+  { code: "tur", label: "Turkish" },
+  { code: "fra", label: "French" },
+  { code: "rus", label: "Russian" },
+  { code: "ind", label: "Indonesian" },
+  { code: "tam", label: "Tamil" },
 ] as const;
+
+/** Language labels for edition codes the settings list may not include. */
+export const LANGUAGE_LABELS: Record<string, string> = {
+  ...Object.fromEntries(TRANSLATION_LANGUAGES.map((l) => [l.code, l.label])),
+  ara: "Arabic",
+};
+
+export const DEFAULT_LANG_CODE = "eng";

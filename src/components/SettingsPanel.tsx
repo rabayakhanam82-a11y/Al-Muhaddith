@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSettings } from "../state/SettingsContext";
 import { TRANSLATION_LANGUAGES } from "../data/constants";
-import { XIcon } from "./icons";
+import { XIcon, LanguageIcon } from "./icons";
 
-/** Translation Settings: Multi-Language Reader configuration controls. */
+/** Translation Settings: multi-language reader configuration controls. */
 export function SettingsPanel({
   open,
   onClose,
@@ -12,8 +12,9 @@ export function SettingsPanel({
   onClose: () => void;
 }) {
   const {
-    langCode,
+    langCodes,
     setLangCode,
+    toggleLangCode,
     arabicScale,
     setArabicScale,
     translationScale,
@@ -113,15 +114,21 @@ export function SettingsPanel({
             ))}
           </div>
           <p className="mt-2 text-[11px] leading-relaxed text-stone-mid/70">
-            Side-by-side renders Arabic and translation in parallel CSS
-            grid columns; stacked keeps the classic vertical flow.
+            Side-by-side renders Arabic and every active translation in
+            parallel columns; stacked keeps the classic vertical flow.
           </p>
         </section>
 
-        {/* Language matrix */}
+        {/* Language matrix: multi-select, first entry is primary */}
         <section>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
-            Translation Language
+          <p className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
+            <LanguageIcon size={14} />
+            Translation Languages
+          </p>
+          <p className="mb-3 text-[11px] leading-relaxed text-stone-mid/70">
+            Toggle any number of languages. Each card shows a labeled block
+            per language; the first one you pick is the primary used for
+            search and fallback.
           </p>
           <input
             type="search"
@@ -132,24 +139,58 @@ export function SettingsPanel({
             aria-label="Filter languages"
           />
           <div className="grid grid-cols-2 gap-2">
-            {languages.map((l) => (
-              <button
-                key={l.code}
-                onClick={() => setLangCode(l.code)}
-                className={`border px-3 py-2.5 text-xs font-medium transition-colors duration-200 ${
-                  langCode === l.code
-                    ? "border-gold bg-gold-faint text-gold"
-                    : "border-hairline text-stone-mid hover:text-parchment"
-                }`}
-              >
-                {l.label}
-              </button>
-            ))}
+            {languages.map((l) => {
+              const active = langCodes.includes(l.code);
+              const isPrimary = active && langCodes[0] === l.code;
+              return (
+                <div key={l.code} className="relative">
+                  <button
+                    onClick={() => (active ? setLangCode(l.code) : toggleLangCode(l.code))}
+                    className={`w-full border px-3 py-2.5 pr-8 text-left text-xs font-medium transition-colors duration-200 ${
+                      active
+                        ? "border-gold bg-gold-faint text-gold"
+                        : "border-hairline text-stone-mid hover:text-parchment"
+                    }`}
+                    title={
+                      active
+                        ? isPrimary
+                          ? "Primary translation"
+                          : "Make primary translation"
+                        : "Show this translation"
+                    }
+                  >
+                    {l.label}
+                  </button>
+                  {active && (
+                    <>
+                      {isPrimary && (
+                        <span
+                          className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-bold uppercase text-gold"
+                          title="Primary translation language"
+                        >
+                          P
+                        </span>
+                      )}
+                      {!isPrimary && langCodes.length > 1 && (
+                        <button
+                          onClick={() => toggleLangCode(l.code)}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 text-stone-mid hover:text-crimson"
+                          title={`Remove ${l.label}`}
+                          aria-label={`Remove ${l.label} translation`}
+                        >
+                          <XIcon size={10} />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <p className="mt-4 text-[11px] leading-relaxed text-stone-mid/70">
-            Switching language rehydrates the collection through the
-            parallel Arabic and translation pipes. Editions without your
-            language fall back to English automatically.
+            Switching languages rehydrates the collection through the
+            parallel Arabic and translation pipes. Editions without a
+            language fall back to your primary translation automatically.
           </p>
         </section>
       </aside>

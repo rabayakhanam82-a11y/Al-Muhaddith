@@ -4,7 +4,7 @@ import { useSettings } from "../state/SettingsContext";
 import { useLibrary } from "../state/LibraryContext";
 import { GradeBadge } from "./GradeBadge";
 import { CollectionGlyph, XIcon } from "./icons";
-import { COLLECTIONS } from "../data/constants";
+import { COLLECTIONS, LANGUAGE_LABELS } from "../data/constants";
 
 /** Focused reader: typography controls apply live via CSS variable scales. */
 export function ReaderModal({
@@ -36,6 +36,17 @@ export function ReaderModal({
   const collection = COLLECTIONS.find((c) => c.key === node.collection);
   const isBookmarked = bookmarks.has(node.id);
   const split = layoutMode === "split";
+
+  const translationBlock = (text: string, langCode?: string) => (
+    <div>
+      {langCode && node.translations.length > 1 && (
+        <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
+          {LANGUAGE_LABELS[langCode] ?? langCode}
+        </span>
+      )}
+      <p className="translation-text">{text}</p>
+    </div>
+  );
 
   return (
     <div
@@ -97,8 +108,15 @@ export function ReaderModal({
                 </p>
               )}
             </div>
-            <div className="border border-hairline bg-ink-sunken p-5">
-              <p className="translation-text">{node.translatedText}</p>
+            <div className="space-y-5">
+              {(node.translations.length
+                ? node.translations
+                : [{ langCode: "", text: node.translatedText }]
+              ).map((t, i) => (
+                <div key={t.langCode || i} className="border border-hairline bg-ink-sunken p-5">
+                  {translationBlock(t.text, t.langCode || undefined)}
+                </div>
+              ))}
             </div>
           </div>
         ) : (
@@ -108,7 +126,14 @@ export function ReaderModal({
                 {node.arabicText}
               </p>
             )}
-            <p className="translation-text">{node.translatedText}</p>
+            {(node.translations.length
+              ? node.translations
+              : [{ langCode: "", text: node.translatedText }]
+            ).map((t, i) => (
+              <div key={t.langCode || i}>
+                {translationBlock(t.text, t.langCode || undefined)}
+              </div>
+            ))}
           </div>
         )}
 

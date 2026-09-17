@@ -3,8 +3,16 @@ import type { HadithNode } from "../types";
 import { useLibrary } from "../state/LibraryContext";
 import { HighlightedText } from "./HighlightedText";
 import { GradeBadge, GraderBadge } from "./GradeBadge";
-import { CollectionGlyph } from "./icons";
-import { COLLECTIONS } from "../data/constants";
+import {
+  BookmarkFilledIcon,
+  CollectionGlyph,
+  ExternalLinkIcon,
+  EyeIcon,
+  FoldersIcon,
+  LanguageIcon,
+  LinkIcon,
+} from "./icons";
+import { COLLECTIONS, LANGUAGE_LABELS } from "../data/constants";
 
 interface HadithCardProps {
   node: HadithNode;
@@ -48,6 +56,15 @@ export function HadithCard({
           {collection && <CollectionGlyph glyph={collection.glyph} size="sm" />}
           {node.sectionName}
         </span>
+        {node.translations.length > 1 && (
+          <span
+            className="inline-flex items-center gap-1 text-[11px] text-stone-mid"
+            title={node.translations.map((t) => LANGUAGE_LABELS[t.langCode] ?? t.langCode).join(", ")}
+          >
+            <LanguageIcon size={13} />
+            {node.translations.length} languages
+          </span>
+        )}
         {node.grades.slice(0, 2).map((g, i) => (
           <GradeBadge key={i} grade={g} />
         ))}
@@ -70,10 +87,26 @@ export function HadithCard({
         </p>
       )}
 
-      {/* Translation block */}
-      <p className="translation-text">
-        <HighlightedText text={node.translatedText} query={searchQuery} />
-      </p>
+      {/* Translation blocks: one block per active language, primary first */}
+      <div className="space-y-3">
+        {node.translations.map((t) => (
+          <div key={t.langCode}>
+            {node.translations.length > 1 && (
+              <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
+                {LANGUAGE_LABELS[t.langCode] ?? t.langCode}
+              </span>
+            )}
+            <p className="translation-text">
+              <HighlightedText text={t.text} query={searchQuery} />
+            </p>
+          </div>
+        ))}
+        {node.translations.length === 0 && node.translatedText && (
+          <p className="translation-text">
+            <HighlightedText text={node.translatedText} query={searchQuery} />
+          </p>
+        )}
+      </div>
 
       {/* Grades detail row */}
       {node.grades.length > 0 && (
@@ -87,10 +120,9 @@ export function HadithCard({
       {/* Action tray */}
       <div className="mt-1 flex items-center justify-between border-t border-hairline pt-3">
         <div className="flex items-center gap-1.5 text-xs text-stone-mid">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-70">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
+          <span className="opacity-70">
+            <EyeIcon />
+          </span>
           <span className="view-counter">{viewCount} views</span>
         </div>
 
@@ -101,9 +133,13 @@ export function HadithCard({
             aria-pressed={isBookmarked}
             title={isBookmarked ? "Remove bookmark" : "Bookmark this narration"}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-            </svg>
+            {isBookmarked ? (
+              <BookmarkFilledIcon />
+            ) : (
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+            )}
             <span className="hidden sm:inline">
               {isBookmarked ? "Saved" : "Bookmark"}
             </span>
@@ -115,9 +151,7 @@ export function HadithCard({
               className="action-btn"
               title="Add to playlist"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-              </svg>
+              <FoldersIcon />
               <span className="hidden sm:inline">Playlist</span>
             </button>
 
@@ -161,10 +195,7 @@ export function HadithCard({
           </div>
 
           <button onClick={share} className="action-btn" title="Copy deep link">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
+            <LinkIcon />
             <span className="hidden sm:inline">Share</span>
             <span className="sr-only">Copy deep link to this hadith</span>
           </button>
@@ -175,11 +206,7 @@ export function HadithCard({
               className="action-btn text-gold"
               title="Open focused reader"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 3h6v6" />
-                <path d="M10 14L21 3" />
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              </svg>
+              <ExternalLinkIcon />
               <span className="hidden sm:inline">Reader</span>
             </button>
           )}

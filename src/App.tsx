@@ -1,14 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { HadithNode } from "./types";
 import { hydrateCollection } from "./data/hydration";
-import { hadithOfTheDay } from "./data/hod";
 import { COLLECTIONS, PAGE_SIZE, SEARCH_DEBOUNCE_MS } from "./data/constants";
 import { SettingsProvider, useSettings } from "./state/SettingsContext";
 import { LibraryProvider } from "./state/LibraryContext";
 import { useViewTracker } from "./hooks/useViewTracker";
 import { Header } from "./components/Header";
-import { Sidebar, type ViewKey } from "./components/Sidebar";
-import { HadithOfTheDay } from "./components/HadithOfTheDay";
+import { SideMenu, type ViewKey } from "./components/SideMenu";
+import { HomeView } from "./components/HomeView";
 import { HadithCard } from "./components/HadithCard";
 import { ReaderModal } from "./components/ReaderModal";
 import { SettingsPanel } from "./components/SettingsPanel";
@@ -17,12 +16,13 @@ import { HistoryView } from "./components/HistoryView";
 import { CollectionGlyph } from "./components/icons";
 
 function AppShell() {
-  const { langCode, layoutMode } = useSettings();
+  const { langCodes, layoutMode } = useSettings();
 
-  const [view, setView] = useState<ViewKey>("browse");
+  const [view, setView] = useState<ViewKey>("home");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [collectionKey, setCollectionKey] = useState("bukhari");
   const [nodes, setNodes] = useState<HadithNode[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [offlineMode, setOfflineMode] = useState(false);
   const [rawQuery, setRawQuery] = useState("");
@@ -38,14 +38,14 @@ function AppShell() {
     return () => clearTimeout(t);
   }, [rawQuery]);
 
-  // Parallel hydration pipe: Arabic + translation loaded concurrently.
+  // Parallel hydration pipe: Arabic + all active translations concurrently.
   const loadCollection = useCallback(async () => {
     setLoading(true);
     setError(null);
     setSectionFilter(null);
     setVisibleCount(PAGE_SIZE);
     try {
-      const result = await hydrateCollection(collectionKey, langCode);
+      const result = await hydrateCollection(collectionKey, langCodes);
       setNodes(result.nodes);
       setOfflineMode(result.offline);
     } catch (err) {
@@ -58,11 +58,28 @@ function AppShell() {
     } finally {
       setLoading(false);
     }
-  }, [collectionKey, langCode]);
+  }, [collectionKey, langCodes]);
 
+  // Hydrate whenever collection or translations change, and whenever the
+  // browse view becomes visible so entering from Home is instant.
   useEffect(() => {
-    void loadCollection();
-  }, [loadCollection]);
+    if (view !== "browse") return;
+    if (nodes.length === 0) void loadCollection();
+  }, [view, nodes.length, loadCollection]);
+
+  // Re-hydrate when the active language set changes while browsing.
+  const langsKey = langCodes.join(",");
+  const lastLangsRef = useRef(langsKey);
+  useEffect(() => {
+    if (view !== "browse") {
+      lastLangsRef.current = langsKey;
+      return;
+    }
+    if (lastLangsRef.current !== langsKey) {
+      lastLangsRef.current = langsKey;
+      void loadCollection();
+    }
+  }, [langsKey, view, loadCollection]);
 
   // Deep-link support: ?hadith=<id> opens the focused reader after hydration,
   // switching collections when the shared id belongs to another book.
@@ -75,6 +92,7 @@ function AppShell() {
     const targetCollection = COLLECTIONS.find((c) => c.key === prefix)?.key;
     if (targetCollection && targetCollection !== collectionKey) {
       setCollectionKey(targetCollection);
+      setView("browse");
       return;
     }
     const node = nodes.find((n) => n.id === pendingDeepLink);
@@ -107,7 +125,6 @@ function AppShell() {
   }, [nodes, query, sectionFilter]);
 
   const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
-  const hod = useMemo(() => hadithOfTheDay(nodes), [nodes]);
 
   useViewTracker(visible);
 
@@ -115,6 +132,34 @@ function AppShell() {
     setView("browse");
     if (key !== collectionKey) setCollectionKey(key);
   };
+
+  const selectView = (v: ViewKey) => {
+    setView(v);
+    if (v !== "browse") setMenuOpen(false);
+  };
+
+  const quickSearch = (q: string) => {
+    setRawQuery(q);
+    setView("browse");
+    setMenuOpen(false);
+  };
+
+  // Quick Read: a hadith number opens the reader directly; empty opens the
+  // whole book stream. Waits for hydration when needed.
+  const [quickReadTarget, setQuickReadTarget] = useState<string | null>(null);
+  const quickRead = (book: string, hadithNo: string) => {
+    setView("browse");
+    if (book !== collectionKey) setCollectionKey(book);
+    setQuickReadTarget(hadithNo ? `${book}-${hadithNo}` : null);
+  };
+  useEffect(() => {
+    if (!quickReadTarget || loading || error) return;
+    const node = nodes.find((n) => n.id === quickReadTarget);
+    if (node) {
+      setReaderNode(node);
+      setQuickReadTarget(null);
+    }
+  }, [quickReadTarget, loading, error, nodes]);
 
   const sections = useMemo(() => {
     const map = new Map<number, string>();
@@ -130,25 +175,44 @@ function AppShell() {
     <div className="min-h-screen">
       <Header
         searchQuery={rawQuery}
-        onSearch={setRawQuery}
+        onSearch={(q) => {
+          setRawQuery(q);
+          if (view === "home") setView("browse");
+        }}
         onToggleSettings={() => setSettingsOpen(true)}
+        onToggleMenu={() => setMenuOpen(true)}
+        menuOpen={menuOpen}
       />
 
-      <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[280px_1fr]">
-        <Sidebar
-          activeCollection={collectionKey}
-          onSelectCollection={selectCollection}
-          activeView={view}
-          onSelectView={setView}
-        />
+      <SideMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        activeView={view}
+        onSelectView={selectView}
+        activeCollection={collectionKey}
+        onSelectCollection={selectCollection}
+      />
 
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
         <main id="main-content" className="flex flex-col gap-6">
+          {view === "home" && (
+            <HomeView
+              onQuickSearch={quickSearch}
+              onOpenReader={setReaderNode}
+              onQuickRead={quickRead}
+            />
+          )}
+
           {view === "browse" && (
             <>
-              <HadithOfTheDay node={hod} onOpenReader={setReaderNode} />
-
               {/* Control bar */}
               <section className="panel flex flex-wrap items-center gap-3 p-4">
+                <button
+                  onClick={() => setView("home")}
+                  className="btn-ghost text-xs text-gold"
+                >
+                  Home
+                </button>
                 <span className="flex items-center gap-2 text-sm font-semibold text-parchment">
                   {collection && <CollectionGlyph glyph={collection.glyph} size="sm" />}
                   {collection?.name}

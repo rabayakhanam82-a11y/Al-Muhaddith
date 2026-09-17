@@ -1,4 +1,9 @@
-import type { HadithNode, RawEditionPayload, RawHadith } from "../types";
+import type {
+  HadithNode,
+  RawEditionPayload,
+  RawHadith,
+  TranslationText,
+} from "../types";
 import { COLLECTIONS } from "./constants";
 import {
   fetchEdition,
@@ -13,35 +18,50 @@ import {
 } from "./db";
 
 /**
- * Deterministic zip mapping: Arabic and translation records are joined on
- * their absolute index (array position), forming one hydrated node per hadith.
+ * Deterministic zip mapping: the Arabic record and every translation record
+ * are joined on their absolute index (array position), forming one hydrated
+ * node per hadith.
  */
 function zipHydrate(
-  translation: RawEditionPayload,
-  arabic: RawEditionPayload,
+  translations: { langCode: string; payload: RawEditionPayload }[],
+  arabic: RawEditionPayload | null,
   collectionKey: string,
 ): HadithNode[] {
   const collection = COLLECTIONS.find((c) => c.key === collectionKey);
   const sections =
-    translation.metadata.sections ?? translation.metadata.section ?? {};
+    translations[0]?.payload.metadata.sections ??
+    translations[0]?.payload.metadata.section ??
+    {};
   const arabicByIndex = new Map<number, RawHadith>();
-  arabic.hadiths.forEach((h, i) => arabicByIndex.set(i, h));
+  arabic?.hadiths.forEach((h, i) => arabicByIndex.set(i, h));
 
-  return translation.hadiths.map((h, i) => {
+  const first = translations[0];
+  if (!first) throw new Error("No translation payload provided");
+
+  return first.payload.hadiths.map((h, i) => {
     const sectionId = Number(h.reference?.book ?? 1);
     const arabicRecord = arabicByIndex.get(i);
     const sectionName =
       sections[String(sectionId)] ?? sections["0"] ?? "General Index";
 
+    const texts: TranslationText[] = [];
+    for (const t of translations) {
+      const record = t.payload.hadiths[i];
+      if (record && record.text) {
+        texts.push({ langCode: t.langCode, text: record.text });
+      }
+    }
+
     return {
       id: `${collectionKey}-${h.hadithnumber}`,
       hadithNumber: h.hadithnumber,
       arabicText: arabicRecord?.text ?? "",
-      translatedText: h.text,
+      translatedText: texts[0]?.text ?? "",
+      translations: texts,
       collection: collectionKey,
       sectionId,
       sectionName,
-      bookTitle: translation.metadata.name ?? collection?.name ?? collectionKey,
+      bookTitle: first.payload.metadata.name ?? collection?.name ?? collectionKey,
       grades: h.grades ?? [],
     };
   });
@@ -79,58 +99,81 @@ async function loadEdition(editionName: string): Promise<LoadedEdition> {
 
 export interface HydrationResult {
   nodes: HadithNode[];
-  editionUsed: string;
+  editionsUsed: string[];
   bookTitle: string;
   fromCache: boolean;
   offline: boolean;
 }
 
 /**
- * Parallel hydration pipe: fetches the original Arabic edition and the target
- * translation edition concurrently, then zips them into unified nodes.
+ * Parallel hydration pipe: fetches the original Arabic edition and every
+ * requested translation edition concurrently, then zips them into unified
+ * nodes keyed by language.
  */
 export async function hydrateCollection(
   collectionKey: string,
-  langCode: string,
+  langCodes: string[],
 ): Promise<HydrationResult> {
   const info = COLLECTIONS.find((c) => c.key === collectionKey);
   if (!info) throw new Error(`Unknown collection: ${collectionKey}`);
 
-  const translationEdition = await resolveTranslationEdition(
-    langCode,
-    collectionKey,
+  const primary = langCodes[0] ?? "eng";
+  const resolved = await Promise.all(
+    langCodes.map(async (lang) => ({
+      lang,
+      edition: await resolveTranslationEdition(lang, collectionKey),
+    })),
   );
-  if (!translationEdition) {
+
+  // Resolve to at least one edition: primary language first, then any other
+  // requested language, then English, else the collection has no translation.
+  const ordered = resolved.filter((r): r is { lang: string; edition: string } =>
+    Boolean(r.edition),
+  );
+  const fallback = ordered.find((r) => r.lang === primary) ?? ordered[0] ?? null;
+  if (!fallback) {
     throw new Error(`No translation edition found for ${collectionKey}`);
   }
+  const others = ordered.filter(
+    (r) => r.edition !== fallback.edition && r.lang !== fallback.lang,
+  );
+  const unique = [fallback, ...others];
 
-  const [translationResult, arabicResult] = await Promise.allSettled([
-    loadEdition(translationEdition),
+  const results = await Promise.allSettled([
+    ...unique.map((r) => loadEdition(r.edition)),
     loadEdition(info.arabicKey),
   ]);
 
-  if (translationResult.status === "rejected") {
-    throw translationResult.reason;
+  const arabicResult = results[results.length - 1];
+  if (unique[0] === undefined || results[0].status === "rejected") {
+    throw (results[0].status === "rejected" ? results[0].reason : new Error("No translation payload"));
   }
 
-  const translation = translationResult.value;
+  const translations: { langCode: string; payload: RawEditionPayload }[] = [];
+  for (let i = 0; i < unique.length; i++) {
+    const r = results[i];
+    if (r.status === "fulfilled") {
+      translations.push({ langCode: unique[i].lang, payload: r.value.payload });
+    }
+  }
+
   const arabic =
-    arabicResult.status === "fulfilled"
-      ? arabicResult.value.payload
-      : null;
+    arabicResult.status === "fulfilled" ? arabicResult.value.payload : null;
 
   const nodes = zipHydrate(
-    translation.payload,
-    arabic ?? { metadata: { name: translation.payload.metadata.name }, hadiths: [] },
+    translations,
+    arabic,
     collectionKey,
   );
 
   return {
     nodes,
-    editionUsed: translationEdition,
-    bookTitle: translation.payload.metadata.name ?? info.name,
-    fromCache: translation.fromCache,
-    offline: translation.fromCache && !navigator.onLine,
+    editionsUsed: unique.map((u) => u.edition),
+    bookTitle: translations[0]?.payload.metadata.name ?? info.name,
+    fromCache: results[0].status === "fulfilled" ? (results[0].value as LoadedEdition).fromCache : false,
+    offline:
+      (results[0].status === "fulfilled" ? (results[0].value as LoadedEdition).fromCache : false) &&
+      !navigator.onLine,
   };
 }
 

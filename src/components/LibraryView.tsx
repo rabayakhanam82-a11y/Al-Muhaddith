@@ -94,22 +94,22 @@ export function LibraryView({
                         Read
                       </button>
                     )}
-                    <button
-                      onClick={() =>
-                        void toggleBookmark(
-                          bm.node ?? {
-                            id: bm.id,
-                            hadithNumber: bm.hadithNumber,
-                            arabicText: "",
-                            translatedText: bm.snippet,
-                            collection: bm.collectionKey,
-                            sectionId: 0,
-                            sectionName: "",
-                            bookTitle: "",
-                            grades: [],
-                          },
-                        )
-                      }
+                    <button                        onClick={() =>
+                          void toggleBookmark(
+                            bm.node ?? {
+                              id: bm.id,
+                              hadithNumber: bm.hadithNumber,
+                              arabicText: "",
+                              translatedText: bm.snippet,
+                              translations: [],
+                              collection: bm.collectionKey,
+                              sectionId: 0,
+                              sectionName: "",
+                              bookTitle: "",
+                              grades: [],
+                            },
+                          )
+                        }
                       className="btn-ghost text-xs text-crimson"
                       title="Remove bookmark"
                     >

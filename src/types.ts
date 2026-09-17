@@ -28,12 +28,22 @@ export interface RawEditionPayload {
   hadiths: RawHadith[];
 }
 
-/** Fully hydrated node: Arabic zipped onto translation by absolute index. */
+/** One translation payload zipped onto a hadith record. */
+export interface TranslationText {
+  /** ISO-ish language code from the CDN edition, e.g. "eng", "urd". */
+  langCode: string;
+  text: string;
+}
+
+/** Fully hydrated node: Arabic zipped onto one or more translations. */
 export interface HadithNode {
   id: string;
   hadithNumber: number | string;
   arabicText: string;
+  /** Primary translation (first entry of `translations`). */
   translatedText: string;
+  /** All requested translations that resolved for this narration. */
+  translations: TranslationText[];
   collection: string;
   sectionId: number;
   sectionName: string;
