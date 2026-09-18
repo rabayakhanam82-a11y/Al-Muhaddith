@@ -1,4 +1,6 @@
-import logoSvg from "../assets/logo.svg";
+import logoSvg from "../assets/logo.svg?raw";
+
+const logoDataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logoSvg)}`;
 import { useEffect } from "react";
 import { COLLECTIONS } from "../data/constants";
 import { useLibrary } from "../state/LibraryContext";
@@ -80,8 +82,8 @@ export function SideMenu({
       >
         <div className="flex items-center justify-between border-b border-hairline pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gold/30 bg-ink-raised/80 p-0.5 shadow-sm">
-              <img src={logoSvg} alt="Logo" className="h-full w-full object-contain" />
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gold/30 bg-ink-raised/80 p-0 shadow-sm">
+              <img src={logoDataUri} alt="Logo" className="h-full w-full scale-[1.04] object-contain" />
             </div>
             <div>
               <span className="block text-sm font-semibold tracking-wide text-parchment leading-none">

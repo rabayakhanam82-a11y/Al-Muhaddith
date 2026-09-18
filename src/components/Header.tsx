@@ -1,14 +1,16 @@
 import { SearchIcon, SettingsIcon, MenuIcon } from "./icons";
 
-import logoSvg from "../assets/logo.svg";
+import logoSvg from "../assets/logo.svg?raw";
+
+const logoDataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logoSvg)}`;
 
 function Logomark() {
   return (
-    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gold/30 bg-ink-raised/90 p-1 shadow-[0_2px_12px_rgba(214,187,105,0.18)] ring-1 ring-gold/10 transition-transform duration-200 hover:scale-105">
+    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gold/30 bg-ink-raised/90 p-0 shadow-[0_2px_12px_rgba(214,187,105,0.18)] ring-1 ring-gold/10 transition-transform duration-200 hover:scale-105">
       <img
-        src={logoSvg}
+        src={logoDataUri}
         alt="Al-Muhaddith Emblem"
-        className="h-full w-full object-contain filter drop-shadow"
+        className="h-full w-full scale-[1.04] object-contain filter drop-shadow"
       />
     </div>
   );
