@@ -1,3 +1,4 @@
+import logoSvg from "../assets/logo.svg";
 import { useEffect } from "react";
 import { COLLECTIONS } from "../data/constants";
 import { useLibrary } from "../state/LibraryContext";
@@ -7,7 +8,6 @@ import {
   CollectionGlyph,
   HistoryIcon,
   HomeIcon,
-  MenuIcon,
   SettingsIcon,
   XIcon,
 } from "./icons";
@@ -79,11 +79,18 @@ export function SideMenu({
         aria-hidden={!open}
       >
         <div className="flex items-center justify-between border-b border-hairline pb-4">
-          <div className="flex items-center gap-2">
-            <MenuIcon size={18} />
-            <span className="text-sm font-semibold tracking-wide text-parchment">
-              Al-Muhaddith
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gold/30 bg-ink-raised/80 p-0.5 shadow-sm">
+              <img src={logoSvg} alt="Logo" className="h-full w-full object-contain" />
+            </div>
+            <div>
+              <span className="block text-sm font-semibold tracking-wide text-parchment leading-none">
+                Al-Muhaddith
+              </span>
+              <span className="block text-[9px] uppercase tracking-wider text-gold/80 mt-0.5">
+                Hadith Studio
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
