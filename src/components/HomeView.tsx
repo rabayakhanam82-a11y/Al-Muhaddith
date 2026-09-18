@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { HadithNode } from "../types";
 import { COLLECTIONS, TRANSLATION_LANGUAGES } from "../data/constants";
+import { ENC_QUICK_TOPICS } from "../data/hadeethenc";
 import { useSettings } from "../state/SettingsContext";
 import { useLibrary } from "../state/LibraryContext";
 import { HadithOfTheDay } from "./HadithOfTheDay";
-import { BookIcon, ChevronDownIcon, SearchIcon } from "./icons";
+import { BookIcon, ChevronDownIcon, SearchIcon, SitemapIcon } from "./icons";
 
 /**
  * Home screen: quick search for hadith, Hadith of the Day, and the Quick Read
@@ -15,10 +16,12 @@ export function HomeView({
   onQuickSearch,
   onOpenReader,
   onQuickRead,
+  onQuickTopic,
 }: {
   onQuickSearch: (query: string) => void;
   onOpenReader: (node: HadithNode) => void;
   onQuickRead: (book: string, hadithNo: string) => void;
+  onQuickTopic: (label: string) => void;
 }) {
   const { langCodes, toggleLangCode } = useSettings();
   const { history } = useLibrary();
@@ -70,6 +73,26 @@ export function HomeView({
           >
             Search
           </button>
+        </div>
+
+        {/* Quick reach topics: seeds a search where the HadeethEnc category
+            index takes priority over the local text filter. */}
+        <div className="mt-5">
+          <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-mid">
+            <SitemapIcon size={13} />
+            Quick reach topics
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {ENC_QUICK_TOPICS.map((t) => (
+              <button
+                key={t.categoryId}
+                onClick={() => onQuickTopic(t.label)}
+                className="border border-hairline px-3 py-1.5 text-xs font-medium text-parchment transition-colors duration-200 hover:border-gold-muted hover:text-gold"
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 

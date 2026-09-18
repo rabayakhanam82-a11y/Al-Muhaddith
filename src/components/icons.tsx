@@ -19,6 +19,7 @@ import bookmarkFilledSvg from "../assets/icons/bookmark-filled.svg?raw";
 import foldersSvg from "../assets/icons/folders.svg?raw";
 import linkSvg from "../assets/icons/link.svg?raw";
 import externalLinkSvg from "../assets/icons/external-link.svg?raw";
+import sitemapSvg from "../assets/icons/sitemap.svg?raw";
 
 /** Inlines a downloaded SVG source with a configurable pixel size. */
 function Svg({ src, size }: { src: string; size: number }) {
@@ -96,6 +97,10 @@ export function LinkIcon({ size = 15 }: IconProps) {
 
 export function ExternalLinkIcon({ size = 15 }: IconProps) {
   return <Svg src={externalLinkSvg} size={size} />;
+}
+
+export function SitemapIcon({ size = 15 }: IconProps) {
+  return <Svg src={sitemapSvg} size={size} />;
 }
 
 /**

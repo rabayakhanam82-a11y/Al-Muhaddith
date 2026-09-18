@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { HadithNode } from "./types";
 import { hydrateCollection } from "./data/hydration";
 import { COLLECTIONS, PAGE_SIZE, SEARCH_DEBOUNCE_MS } from "./data/constants";
+import { encLanguageCode } from "./data/hadeethenc";
 import { SettingsProvider, useSettings } from "./state/SettingsContext";
 import { LibraryProvider } from "./state/LibraryContext";
 import { useViewTracker } from "./hooks/useViewTracker";
@@ -10,6 +11,8 @@ import { SideMenu, type ViewKey } from "./components/SideMenu";
 import { HomeView } from "./components/HomeView";
 import { HadithCard } from "./components/HadithCard";
 import { ReaderModal } from "./components/ReaderModal";
+import { TopicSearch } from "./components/TopicSearch";
+import { TopicReader } from "./components/TopicReader";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { LibraryView } from "./components/LibraryView";
 import { HistoryView } from "./components/HistoryView";
@@ -29,6 +32,9 @@ function AppShell() {
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [readerNode, setReaderNode] = useState<HadithNode | null>(null);
+  const [topicEncId, setTopicEncId] = useState<string | null>(null);
+  /** Hydrated nodes kept per collection: the matching index for the topic layer. */
+  const [indexBuckets, setIndexBuckets] = useState<Record<string, HadithNode[]>>({});
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [sectionFilter, setSectionFilter] = useState<number | null>(null);
 
@@ -48,6 +54,7 @@ function AppShell() {
       const result = await hydrateCollection(collectionKey, langCodes);
       setNodes(result.nodes);
       setOfflineMode(result.offline);
+      setIndexBuckets((prev) => ({ ...prev, [collectionKey]: result.nodes }));
     } catch (err) {
       setNodes([]);
       setError(
@@ -144,6 +151,14 @@ function AppShell() {
     setMenuOpen(false);
   };
 
+  // Quick reach: a topic label seeds the search, where the encyclopedia
+  // category index takes priority over the local text filter.
+  const quickTopic = (label: string) => {
+    setRawQuery(label);
+    setView("browse");
+    setMenuOpen(false);
+  };
+
   // Quick Read: a hadith number opens the reader directly; empty opens the
   // whole book stream. Waits for hydration when needed.
   const [quickReadTarget, setQuickReadTarget] = useState<string | null>(null);
@@ -170,6 +185,13 @@ function AppShell() {
   }, [nodes]);
 
   const collection = COLLECTIONS.find((c) => c.key === collectionKey);
+
+  // Hydrated index buckets for the topic-layer matching system, rebuilt only
+  // when the underlying bucket map changes.
+  const topicIndexBuckets = useMemo(
+    () => Object.values(indexBuckets).filter((b) => b.length > 0),
+    [indexBuckets],
+  );
 
   return (
     <div className="min-h-screen">
@@ -200,11 +222,20 @@ function AppShell() {
               onQuickSearch={quickSearch}
               onOpenReader={setReaderNode}
               onQuickRead={quickRead}
+              onQuickTopic={quickTopic}
             />
           )}
 
           {view === "browse" && (
             <>
+              {/* Topic layer: HadeethEnc category index, prioritized */}
+              <TopicSearch
+                query={query}
+                language={encLanguageCode(langCodes[0] ?? "eng")}
+                visible={Boolean(query.trim())}
+                onOpenHit={(encId) => setTopicEncId(encId)}
+              />
+
               {/* Control bar */}
               <section className="panel flex flex-wrap items-center gap-3 p-4">
                 <button
@@ -349,6 +380,13 @@ function AppShell() {
       </footer>
 
       <ReaderModal node={readerNode} onClose={() => setReaderNode(null)} />
+      <TopicReader
+        encId={topicEncId}
+        language={encLanguageCode(langCodes[0] ?? "eng")}
+        indexBuckets={topicIndexBuckets}
+        onOpenNode={setReaderNode}
+        onClose={() => setTopicEncId(null)}
+      />
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );

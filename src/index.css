@@ -82,6 +82,19 @@ body {
   .action-btn {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-mid transition-colors duration-200 hover:bg-hover-wash hover:text-parchment;
   }
+
+  /* Loading pulse for the topic (encyclopedia) layer. */
+  .animate-soft-pulse {
+    animation: softPulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes softPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-soft-pulse { animation: none; }
 }
 
 /* Header: solid bar, hairline divider, no blur or shadow. */
