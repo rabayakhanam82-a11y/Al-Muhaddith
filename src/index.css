@@ -3,84 +3,188 @@
 @tailwind utilities;
 
 :root {
-  --bg-base-dominant: #07130f;
-  --bg-surface-panel: #0e1f18;
-  --bg-surface-raised: #122b21;
-  --bg-surface-sunken: #030d09;
-  --border-hairline: rgba(213, 189, 114, 0.16);
-  --border-accent-gold: #d6bb69;
-  --border-muted-gold: rgba(214, 187, 105, 0.28);
-  --text-primary-high: #f7f2df;
-  --text-secondary-mid: #9db1a6;
-  --status-sahih: #65d59b;
-  --status-hasan: #9ae6bd;
-  --status-daif: #e5b563;
-  --status-mawdu: #ed7d6d;
+  /* Crisp, high-definition tokens inspired by reference studio UI */
+  --bg-primary: #090e15;
+  --bg-secondary: #0f1722;
+  --bg-tertiary: #16202e;
+  --card-bg: #121a26;
+  --input-bg: #0b111a;
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent: #10b981;
+  --accent-deep: #059669;
+  --accent-hover: #34d399;
+
+  --gold: #d4af37;
+  --gold-light: #f3e5ab;
+  --gold-dim: rgba(212, 175, 55, 0.16);
+
+  --status-sahih: #10b981;
+  --status-hasan: #34d399;
+  --status-daif: #f59e0b;
+  --status-mawdu: #ef4444;
 
   --arabic-scale: 1;
   --translation-scale: 1;
   --layout-mode: stacked;
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--bg-base-dominant); }
-
-body {
-  @apply bg-ink-base font-sans antialiased;
-  min-height: 100vh;
-  overflow-x: hidden;
-  color: var(--text-primary-high);
+* {
+  box-sizing: border-box;
 }
 
-::selection { background: rgba(214,187,105,.35); color: #fffdf1; }
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: #07130f; }
-::-webkit-scrollbar-thumb { background: #1f4938; border: 3px solid #07130f; border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: #2a5c47; }
+body {
+  @apply font-sans antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  background:
+    radial-gradient(circle at 12% 16%, rgba(212, 175, 55, 0.09), transparent 34%),
+    radial-gradient(circle at 84% -10%, rgba(16, 185, 129, 0.12), transparent 42%),
+    linear-gradient(172deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+::selection {
+  background: rgba(212, 175, 55, 0.35);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--bg-primary);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.4);
+}
 
 @layer components {
-  /* Flat editorial panel: hairline border, solid fill, no radius, no shadow. */
+  /* Crisp, high-definition panel with solid card background and clean border */
   .panel {
-    @apply border bg-ink-panel;
-    border-color: var(--border-hairline);
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    border-radius: 14px;
+    position: relative;
   }
 
   .arabic-text {
-    @apply font-arabic text-right leading-relaxed;
+    @apply font-arabic text-right;
     direction: rtl;
-    color: var(--text-primary-high);
-    font-size: calc(1.9rem * var(--arabic-scale));
-    line-height: 2.35;
+    color: var(--text-primary);
+    font-size: calc(1.85rem * var(--arabic-scale));
+    line-height: 2.2;
     overflow-wrap: anywhere;
+    word-spacing: 2px;
+  }
+
+  /* Distinguished translation box */
+  .translation-container {
+    background: rgba(22, 32, 46, 0.85);
+    border: 1px solid var(--border-color);
+    border-left: 3.5px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    margin-top: 8px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .translation-container:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    border-left-color: var(--gold-light);
+    background: rgba(22, 32, 46, 0.98);
+  }
+
+  .translation-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
   }
 
   .translation-text {
-    font-size: calc(1.1rem * var(--translation-scale));
-    line-height: 1.85;
-    color: #d4ded6;
+    font-size: calc(1rem * var(--translation-scale));
+    line-height: 1.68;
+    color: #e2e8f0;
     overflow-wrap: anywhere;
   }
 
-  .gold-rule { height: 1px; background: var(--border-muted-gold); }
+  .gold-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
 
-  .search-highlight { background: rgba(214,187,105,.3); color: #fffdf1; padding: 0 2px; }
+  .search-highlight {
+    background: rgba(212, 175, 55, 0.35);
+    color: #ffffff;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-stone-mid transition-colors duration-200 hover:bg-hover-wash hover:text-parchment;
+    @apply inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all;
+    color: var(--text-secondary);
+    border-radius: 9px;
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
   }
 
   .input-plain {
-    @apply w-full px-4 py-2.5 text-parchment transition-colors duration-200;
-    background: var(--bg-surface-sunken);
-    border: 1px solid rgba(213,189,114,.18);
+    @apply w-full px-4 py-2.5 transition-all;
+    color: var(--text-primary);
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
     outline: none;
   }
-  .input-plain::placeholder { color: #6e8b7d; }
-  .input-plain:focus { border-color: var(--border-accent-gold); }
+  .input-plain::placeholder {
+    color: var(--text-muted);
+  }
+  .input-plain:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
+  }
 
   .action-btn {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-mid transition-colors duration-200 hover:bg-hover-wash hover:text-parchment;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    border: 1px solid transparent;
+  }
+  .action-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-subtle);
   }
 
   /* Loading pulse for the topic (encyclopedia) layer. */
@@ -97,50 +201,209 @@ body {
   .animate-soft-pulse { animation: none; }
 }
 
-/* Header: solid bar, hairline divider, no blur or shadow. */
+/* Sticky top header: crisp, sharp contrast without heavy blur */
 header.sticky {
-  background: var(--bg-base-dominant);
-  border-color: var(--border-hairline);
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+}
+header.sticky > div {
+  min-height: 64px;
 }
 
-/* Cards: fade-in entrance, color-only hover. */
-.hadith-card {
-  animation: fadeUp .45s cubic-bezier(.4, 0, .2, 1) both;
-  transition: border-color .2s ease;
+/* Home hero */
+main > div > section:first-child,
+main > div > section[aria-label="Quick read"] {
+  position: relative;
+  overflow: hidden;
 }
-.hadith-card:hover { border-color: var(--border-muted-gold); }
-.hadith-card .arabic-text { font-size: calc(1.7rem * var(--arabic-scale)); }
+main > div > section:first-child {
+  min-height: 330px;
+  background: radial-gradient(circle at 92% 20%, rgba(212, 175, 55, 0.12), transparent 22rem), linear-gradient(135deg, #101c27 0%, #0a111a 100%);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+}
+main > div > section:first-child::before {
+  content: "۞";
+  position: absolute;
+  right: 6%;
+  top: 2%;
+  font-family: Amiri, serif;
+  font-size: 11rem;
+  line-height: 1;
+  color: rgba(212, 175, 55, 0.06);
+  pointer-events: none;
+}
+main > div > section:first-child > * { position: relative; z-index: 1; }
+main > div > section:first-child h1 { max-width: 760px; color: #ffffff; font-weight: 700; }
+main > div > section[aria-label="Quick read"] {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.hadith-card {
+  animation: fadeUp .35s cubic-bezier(.23, 1, .32, 1) both;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+}
+.hadith-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(212, 175, 55, 0.15);
+}
+.hadith-card .arabic-text {
+  font-size: calc(1.75rem * var(--arabic-scale));
+  color: var(--text-primary);
+}
+
+section[aria-label="Hadith of the Day"] {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  background: radial-gradient(circle at 90% 20%, rgba(212, 175, 55, 0.12), transparent 20rem), linear-gradient(140deg, #132230 0%, #0c141d 100%);
+}
+section[aria-label="Hadith of the Day"]::before {
+  content: "۞";
+  position: absolute;
+  right: 6%;
+  top: 2%;
+  font-family: Amiri, serif;
+  font-size: 9.5rem;
+  line-height: 1;
+  color: rgba(212, 175, 55, 0.06);
+  pointer-events: none;
+}
+section[aria-label="Hadith of the Day"] > * { position: relative; z-index: 1; }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hadith-card { animation: none; }
-  * { transition-duration: .01ms !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
 }
 
-/* Native controls */
 select { color-scheme: dark; }
-option { background: #0c2117; color: #f7f2df; }
-footer { color: #718d7e; letter-spacing: .02em; }
+option { background: var(--bg-secondary); color: var(--text-primary); }
+footer { color: var(--text-muted) !important; letter-spacing: .02em; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px solid #d6bb69; outline-offset: 3px; }
+button:active { transform: scale(.98); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 a { color: inherit; }
 
-/* Keep legacy utility class names legible under the flat system. */
-.border-hairline { border-color: var(--border-hairline); }
-.bg-ink-raised { background: var(--bg-surface-raised); }
-.bg-ink-sunken { background: var(--bg-base-dominant); }
-.bg-hover-wash:hover { background: rgba(255,255,255,.05); }
-.text-gold { color: var(--border-accent-gold); }
-.border-gold-muted { border-color: var(--border-muted-gold); }
-.bg-gold-faint { background: rgba(214,187,105,.09); }
+/* Legacy class alias bindings to keep all components crisp */
+.border-hairline { border-color: var(--border-color) !important; }
+.bg-ink-panel { background: var(--card-bg) !important; }
+.bg-ink-raised { background: var(--bg-tertiary) !important; }
+.bg-ink-sunken { background: var(--input-bg) !important; }
+.text-parchment { color: var(--text-primary) !important; }
+.text-stone-mid { color: var(--text-secondary) !important; }
+.text-gold { color: var(--gold) !important; }
+.border-gold-muted { border-color: rgba(212, 175, 55, 0.35) !important; }
+.bg-gold-faint { background: var(--gold-dim) !important; }
+.bg-hover-wash:hover { background: rgba(255, 255, 255, 0.08) !important; }
 
-/* Long Arabic lines never bleed horizontally. */
-[role="dialog"] .arabic-text { overflow-wrap: anywhere; }
+/* Status tokens */
+.text-mint-sahih { color: var(--status-sahih) !important; }
+.bg-mint-sahih { background: rgba(16, 185, 129, 0.15) !important; }
+.border-mint-sahih { border-color: rgba(16, 185, 129, 0.45) !important; }
 
-/* Settings and menu overlays: flat dark scrim, no blur. */
-.fixed.inset-0 { background: rgba(2, 10, 7, .7); }
+.text-mint-hasan { color: var(--status-hasan) !important; }
+.bg-mint-hasan { background: rgba(52, 211, 153, 0.15) !important; }
+.border-mint-hasan { border-color: rgba(52, 211, 153, 0.45) !important; }
 
-/* End of visual system. */
+.text-ochre { color: var(--status-daif) !important; }
+.bg-ochre { background: rgba(245, 158, 11, 0.15) !important; }
+.border-ochre { border-color: rgba(245, 158, 11, 0.45) !important; }
+
+.text-crimson { color: var(--status-mawdu) !important; }
+.bg-crimson { background: rgba(239, 68, 68, 0.15) !important; }
+.border-crimson { border-color: rgba(239, 68, 68, 0.45) !important; }
+
+[aria-hidden="true"] span, [aria-hidden="true"] div {
+  background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(212, 175, 55, 0.12), rgba(255,255,255,.04));
+  background-size: 200% 100%;
+  animation: shimmer 1.7s linear infinite;
+}
+
+.fixed.inset-0.bg-black\/60,
+.fixed.inset-0.bg-black\/75 {
+  background: rgba(0, 0, 0, 0.78) !important;
+}
+
+[role="dialog"][aria-label="Navigation menu"] {
+  background: var(--bg-secondary) !important;
+  border-right: 1px solid var(--border-color) !important;
+  box-shadow: 20px 0 60px rgba(0, 0, 0, 0.65) !important;
+}
+[role="dialog"][aria-label="Navigation menu"] button:hover,
+[role="dialog"][aria-label="Navigation menu"] button[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+}
+
+@media (max-width: 1023px) {
+  header.sticky > div { min-height: 60px; }
+  main > div > section:first-child { min-height: 310px; }
+  .sm\:px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+}
+@media (max-width: 640px) {
+  .panel { border-radius: 12px; }
+  main > div > section:first-child { min-height: 290px; padding: 1.35rem !important; }
+  main > div > section:first-child::before { font-size: 7.5rem; }
+  .arabic-text { font-size: calc(1.55rem * var(--arabic-scale)); line-height: 2.05; }
+  .hadith-card .arabic-text { font-size: calc(1.48rem * var(--arabic-scale)); }
+  button { min-height: 36px; }
+}
+
+@media print {
+  body { background: white; color: black; }
+  header, footer, button { display: none !important; }
+  .panel { box-shadow: none; border: 1px solid #ddd; }
+}
+
+  /* Screenshot-accurate translation card styling */
+  .translation-card-gold {
+    background: #0d2118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4.5px solid #d4af37 !important;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .translation-card-emerald {
+    background: #0d2118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4.5px solid #10b981 !important;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .translation-card-teal {
+    background: #0d2118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4.5px solid #14b8a6 !important;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .translation-header-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #e5b84c;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .translation-body-text {
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: #f8fafc;
+  }

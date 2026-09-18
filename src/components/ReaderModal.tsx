@@ -3,7 +3,7 @@ import type { HadithNode } from "../types";
 import { useSettings } from "../state/SettingsContext";
 import { useLibrary } from "../state/LibraryContext";
 import { GradeBadge } from "./GradeBadge";
-import { CollectionGlyph, XIcon } from "./icons";
+import { BookmarkFilledIcon, BookmarkIcon, CollectionGlyph, XIcon } from "./icons";
 import { COLLECTIONS, LANGUAGE_LABELS } from "../data/constants";
 
 /** Focused reader: typography controls apply live via CSS variable scales. */
@@ -14,8 +14,7 @@ export function ReaderModal({
   node: HadithNode | null;
   onClose: () => void;
 }) {
-  const { layoutMode, setLayoutMode, arabicScale, translationScale } =
-    useSettings();
+  const { layoutMode, setLayoutMode } = useSettings();
   const { toggleBookmark, bookmarks } = useLibrary();
 
   useEffect(() => {
@@ -45,59 +44,73 @@ export function ReaderModal({
       : [];
   })();
 
-  const translationBlock = (text: string, langCode?: string) => (
-    <div>
-      {langCode && node.translations.length > 1 && (
-        <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
-          {LANGUAGE_LABELS[langCode] ?? langCode}
-        </span>
-      )}
-      <p className="translation-text">{text}</p>
-    </div>
-  );
+    const translationBlock = (text: string, langCode?: string, idx: number = 0) => {
+    const isGold = !langCode || langCode === "eng" || idx === 0;
+    const borderClass = isGold
+      ? "translation-card-gold"
+      : langCode === "ben"
+      ? "translation-card-emerald"
+      : "translation-card-teal";
+    const langLabel =
+      langCode === "eng"
+        ? "ENGLISH TRANSLATION"
+        : langCode === "ben"
+        ? "BENGALI - ABU BAKR ZAKARIA"
+        : langCode
+        ? `${(LANGUAGE_LABELS[langCode] ?? langCode).toUpperCase()} TRANSLATION`
+        : "TRANSLATION";
+
+    return (
+      <div className={borderClass}>
+        <div className="translation-header-title">
+          <span>{langLabel}</span>
+        </div>
+        <p className="translation-body-text">{text}</p>
+      </div>
+    );
+  };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
-      aria-label="Focused hadith reader"
+      aria-label="Hadith reader"
     >
       <div
-        className="panel max-h-[88vh] w-full max-w-4xl overflow-y-auto bg-ink-panel p-6 sm:p-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
-              Focused Reader
-            </p>
-            <h2 className="mt-2 flex items-center gap-2.5 text-lg font-semibold text-parchment">
-              {collection && <CollectionGlyph glyph={collection.glyph} size="sm" />}
+        className="fixed inset-0 bg-black/75 backdrop-blur-md"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div className="panel relative z-10 flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-hairline bg-ink-raised shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-hairline px-6 py-4">
+          <div className="flex items-center gap-2">
+            {collection && <CollectionGlyph glyph={collection.glyph} size="sm" />}
+            <span className="text-sm font-semibold text-parchment">
               {collection?.name} · No. {node.hadithNumber}
-            </h2>
-            <p className="text-xs text-stone-mid">{node.sectionName}</p>
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
             <button
-              onClick={() =>
-                setLayoutMode(split ? "stacked" : "split")
-              }
-              className="btn-ghost border border-gold-muted text-xs"
-              title="Toggle stacked / split layout"
+              onClick={() => setLayoutMode(split ? "stacked" : "split")}
+              className="btn-ghost hidden text-xs sm:inline-flex"
+              title="Toggle reading orientation"
             >
-              {split ? "Stacked" : "Split"}
+              {split ? "Stacked view" : "Side-by-side view"}
             </button>
             <button
               onClick={() => void toggleBookmark(node)}
-              className={`btn-ghost border border-gold-muted text-xs ${isBookmarked ? "text-crimson" : "text-gold"}`}
+              className={`btn-ghost ${isBookmarked ? "text-crimson" : ""}`}
+              aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this hadith"}
             >
-              {isBookmarked ? "Saved" : "Save"}
+              {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon size={16} />}
             </button>
             <button
               onClick={onClose}
-              className="btn-ghost border border-gold-muted text-xs"
+              className="btn-ghost"
               aria-label="Close reader"
             >
               <XIcon />
@@ -105,71 +118,49 @@ export function ReaderModal({
           </div>
         </div>
 
-        {split ? (
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="border border-hairline bg-ink-sunken p-5">
-              {node.arabicText ? (
-                <p className="arabic-text">{node.arabicText}</p>
-              ) : (
-                <p className="text-sm text-stone-mid">
-                  Arabic source unavailable for this node.
-                </p>
-              )}
-            </div>
-            <div className="space-y-5">
-              {translationList.length > 0 ? (
-                translationList.map((t, i) => (
-                  <div key={t.langCode || i} className="border border-hairline bg-ink-sunken p-5">
-                    {translationBlock(t.text, t.langCode || undefined)}
-                  </div>
-                ))
-              ) : (
-                <p className="border border-hairline bg-ink-sunken p-5 text-sm text-stone-mid">
-                  Translation text unavailable for this record in the active
-                  languages.
-                </p>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {node.arabicText && (
-              <p className="arabic-text border-b border-hairline pb-5">
-                {node.arabicText}
-              </p>
-            )}
-            {translationList.map((t, i) => (
-              <div key={t.langCode || i}>
-                {translationBlock(t.text, t.langCode || undefined)}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {node.grades.length > 0 && (
-          <div className="mt-8 border-t border-hairline pt-5">
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-stone-mid">
-              Scholastic grading
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {node.grades.map((g, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center gap-2 border border-hairline bg-ink-sunken px-3 py-1 text-xs text-stone-mid"
-                >
-                  <GradeBadge grade={g} />
-                  <span>{g.name}</span>
-                </span>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-stone-mid">{node.sectionName}</span>
+            {node.grades
+              .filter((g) => /[a-z]/i.test(g.grade ?? ""))
+              .map((g, i) => (
+                <GradeBadge key={i} grade={g} />
               ))}
-            </div>
           </div>
-        )}
 
-        <p className="mt-6 text-[11px] text-stone-mid/70">
-          Typography scales: Arabic ×{arabicScale.toFixed(2)} · Translation
-          ×{translationScale.toFixed(2)}. Adjust in Settings; changes apply
-          instantly without refetching data.
-        </p>
+          {split ? (
+            <div className="grid gap-8 md:grid-cols-2">
+              <div className="order-2 border-t border-hairline pt-6 md:order-1 md:border-t-0 md:pt-0">
+                <div className="space-y-4">
+                  {translationList.map((t, i) => (
+                    <div key={t.langCode}>
+                      {translationBlock(t.text, t.langCode, i)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="order-1 md:order-2 md:border-l md:border-hairline md:pl-8">
+                <p className="arabic-text">{node.arabicText}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {node.arabicText && (
+                <p className="arabic-text border-b border-hairline pb-6">
+                  {node.arabicText}
+                </p>
+              )}
+              <div className="space-y-4">
+                {translationList.map((t, i) => (
+                  <div key={t.langCode}>
+                    {translationBlock(t.text, t.langCode, i)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

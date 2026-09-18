@@ -26,7 +26,7 @@ function Svg({ src, size }: { src: string; size: number }) {
   return (
     <span
       aria-hidden="true"
-      className="inline-flex shrink-0 items-center justify-center [&>svg]:h-full [&>svg]:w-full"
+      className="inline-flex shrink-0 items-center justify-center [&>svg]:h-full [&>svg]:w-full transition-transform"
       style={{ width: size, height: size }}
       dangerouslySetInnerHTML={{ __html: src }}
     />
@@ -114,11 +114,11 @@ export function CollectionGlyph({
   glyph: string;
   size?: "sm" | "md";
 }) {
-  const box = size === "sm" ? "h-5 w-5 text-[11px]" : "h-7 w-7 text-sm";
+  const box = size === "sm" ? "h-5 w-5 text-[11px] rounded" : "h-7 w-7 text-sm rounded-md";
   return (
     <span
       aria-hidden="true"
-      className={`inline-grid shrink-0 place-items-center border border-hairline bg-ink-sunken font-arabic leading-none text-gold ${box}`}
+      className={`inline-grid shrink-0 place-items-center border border-hairline bg-ink-sunken font-arabic leading-none text-gold shadow-sm ${box}`}
     >
       {glyph}
     </span>

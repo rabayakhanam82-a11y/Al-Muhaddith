@@ -114,16 +114,16 @@ export function HadithOfTheDay({
         </p>
       )}
 
-      {translations.map((t) => (
-        <div key={t.langCode} className="mt-5 first:mt-6">
-          {t.langCode !== "eng" && node.translations.length > 1 && (
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-mid/70">
-              {LANGUAGE_LABELS[t.langCode] ?? t.langCode}
-            </span>
-          )}
-          <p className="translation-text text-parchment">“{t.text}”</p>
-        </div>
-      ))}
+      <div className="mt-5 space-y-3">
+        {translations.map((t) => (
+          <div key={t.langCode} className="translation-container">
+            <div className="translation-label">
+              <span>{LANGUAGE_LABELS[t.langCode] ?? t.langCode}</span>
+            </div>
+            <p className="translation-text">“{t.text}”</p>
+          </div>
+        ))}
+      </div>
 
       {translationStrip && (
         <p className="mt-3 text-[11px] text-stone-mid/70">{translationStrip}</p>
