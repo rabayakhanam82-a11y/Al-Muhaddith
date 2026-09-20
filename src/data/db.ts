@@ -92,6 +92,16 @@ export async function hasAnyEditionCache(edition: string): Promise<boolean> {
   return Boolean(record);
 }
 
+export async function deleteEdition(edition: string): Promise<void> {
+  const db = await getDB();
+  await db.delete("editions", edition);
+}
+
+export async function getAllCachedEditions(): Promise<EditionRecord[]> {
+  const db = await getDB();
+  return db.getAll("editions");
+}
+
 /* ------------------------------- Views log ------------------------------- */
 
 export async function getAllViews(): Promise<Map<string, ViewRecord>> {

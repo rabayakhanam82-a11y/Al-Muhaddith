@@ -1,4 +1,5 @@
 import { LANGUAGE_LABELS } from "./constants";
+import { getOfflineCategoryNodes, searchOfflineCategories } from "./categories";
 
 // LANGUAGE_LABELS is re-exported at the bottom for label lookups.
 /**
@@ -114,27 +115,34 @@ let categoriesCache: EncCategoryNode[] | null = null;
 /** Fetch the full category tree once per session, resolved with depth/leaf. */
 export async function fetchEncCategories(): Promise<EncCategoryNode[]> {
   if (categoriesCache) return categoriesCache;
-  const raw = await encFetch<EncCategory[]>(
-    `${ENC_API}/categories/list?language=en`,
-  );
-  const childrenOf = new Map<string, EncCategory[]>();
-  for (const c of raw) {
-    const parent = c.parent_id ?? "root";
-    const list = childrenOf.get(parent) ?? [];
-    list.push(c);
-    childrenOf.set(parent, list);
-  }
-  const nodes: EncCategoryNode[] = [];
-  const walk = (parentId: string, depth: number) => {
-    for (const c of childrenOf.get(parentId) ?? []) {
-      const children = childrenOf.get(c.id) ?? [];
-      nodes.push({ ...c, depth, isLeaf: children.length === 0 });
-      walk(c.id, depth + 1);
+  try {
+    const raw = await encFetch<EncCategory[]>(
+      `${ENC_API}/categories/list?language=en`,
+    );
+    const childrenOf = new Map<string, EncCategory[]>();
+    for (const c of raw) {
+      const parent = c.parent_id ?? "root";
+      const list = childrenOf.get(parent) ?? [];
+      list.push(c);
+      childrenOf.set(parent, list);
     }
-  };
-  walk("root", 0);
-  categoriesCache = nodes;
-  return nodes;
+    const nodes: EncCategoryNode[] = [];
+    const walk = (parentId: string, depth: number) => {
+      for (const c of childrenOf.get(parentId) ?? []) {
+        const children = childrenOf.get(c.id) ?? [];
+        nodes.push({ ...c, depth, isLeaf: children.length === 0 });
+        walk(c.id, depth + 1);
+      }
+    };
+    walk("root", 0);
+    categoriesCache = nodes;
+    return nodes;
+  } catch {
+    // Offline fallback: return built-in HadeethEnc category tree
+    const offlineNodes = getOfflineCategoryNodes();
+    categoriesCache = offlineNodes;
+    return offlineNodes;
+  }
 }
 
 /** Case-insensitive category title search, ranked parents-first. */
@@ -144,24 +152,28 @@ export async function searchEncCategories(
 ): Promise<EncCategoryNode[]> {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  const all = await fetchEncCategories();
-  const words = q.split(/\s+/);
-  const scored = all
-    .map((c) => {
-      const title = c.title.toLowerCase();
-      let score = 0;
-      if (title === q) score = 100;
-      else if (title.startsWith(q)) score = 80;
-      else if (words.every((w) => title.includes(w))) score = 60;
-      else if (title.includes(q)) score = 40;
-      if (score > 0 && c.depth === 0) score += 5;
-      if (score > 0 && !c.isLeaf) score += 2;
-      return { c, score };
-    })
-    .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
-  return scored.map((s) => s.c);
+  try {
+    const all = await fetchEncCategories();
+    const words = q.split(/\s+/);
+    const scored = all
+      .map((c) => {
+        const title = c.title.toLowerCase();
+        let score = 0;
+        if (title === q) score = 100;
+        else if (title.startsWith(q)) score = 80;
+        else if (words.every((w) => title.includes(w))) score = 60;
+        else if (title.includes(q)) score = 40;
+        if (score > 0 && c.depth === 0) score += 5;
+        if (score > 0 && !c.isLeaf) score += 2;
+        return { c, score };
+      })
+      .filter((s) => s.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+    return scored.map((s) => s.c);
+  } catch {
+    return searchOfflineCategories(query, limit);
+  }
 }
 
 /* ------------------------------ Hadith reads ----------------------------- */

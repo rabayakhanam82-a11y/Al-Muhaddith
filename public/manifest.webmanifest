@@ -1,0 +1,26 @@
+{
+  "name": "Al-Muhaddith | The Living Hadith Library",
+  "short_name": "Al-Muhaddith",
+  "description": "Comprehensive offline-first Hadith library with verified Arabic texts, canonical collections, multi-language translations, and topic categorization.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#051414",
+  "theme_color": "#051414",
+  "categories": ["books", "reference", "education", "lifestyle"],
+  "icons": [
+    {
+      "src": "/src/assets/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/src/assets/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

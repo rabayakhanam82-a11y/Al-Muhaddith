@@ -19,6 +19,7 @@ interface HadithCardProps {
   node: HadithNode;
   searchQuery: string;
   onOpenReader?: (node: HadithNode) => void;
+  onSelectCategory?: (categoryTitle: string) => void;
   index?: number;
 }
 
@@ -36,6 +37,7 @@ export function HadithCard({
   node,
   searchQuery,
   onOpenReader,
+  onSelectCategory,
   index = 0,
 }: HadithCardProps) {
   const { bookmarks, views, toggleBookmark, playlists, addToPlaylist, removeFromPlaylist } =
@@ -80,6 +82,23 @@ export function HadithCard({
             <LanguageIcon size={13} />
             {translations.length} languages
           </span>
+        )}
+        {node.categories && node.categories.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1">
+            {node.categories.slice(0, 2).map((cat) => (
+              <button
+                key={cat.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectCategory?.(cat.title);
+                }}
+                className="inline-flex items-center rounded border border-emerald/30 bg-emerald/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-emerald-light transition-colors hover:border-emerald hover:bg-emerald/20"
+                title={`Topic: ${cat.title}`}
+              >
+                {cat.title}
+              </button>
+            ))}
+          </div>
         )}
         {grades.slice(0, 2).map((g, i) => (
           <GradeBadge key={i} grade={g} />

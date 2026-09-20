@@ -1,0 +1,6 @@
+{
+  "name": "Al-Muhaddith",
+  "description": "A quiet studio reader for the Hadith corpus with authentic grading, multi-language reading, and the transmission history of Hadith preservation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

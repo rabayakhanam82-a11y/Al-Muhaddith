@@ -336,6 +336,10 @@ function AppShell() {
                       node={node}
                       searchQuery={query}
                       onOpenReader={setReaderNode}
+                      onSelectCategory={(topic) => {
+                        setRawQuery(topic);
+                        setQuery(topic);
+                      }}
                       index={i}
                     />
                   ))}

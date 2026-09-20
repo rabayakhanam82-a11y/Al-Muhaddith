@@ -5,6 +5,7 @@ import type {
   TranslationText,
 } from "../types";
 import { COLLECTIONS } from "./constants";
+import { getHadithCategories } from "./categories";
 import {
   fetchEdition,
   fetchEditionsIndex,
@@ -52,17 +53,30 @@ function zipHydrate(
       }
     }
 
+    const arabicText = arabicRecord?.text ?? "";
+    const primaryTrans = texts[0]?.text ?? "";
+
+    const categories = getHadithCategories({
+      collection: collectionKey,
+      hadithNumber: h.hadithnumber,
+      arabicText,
+      sectionName,
+      sectionId,
+      translatedText: primaryTrans,
+    });
+
     return {
       id: `${collectionKey}-${h.hadithnumber}`,
       hadithNumber: h.hadithnumber,
-      arabicText: arabicRecord?.text ?? "",
-      translatedText: texts[0]?.text ?? "",
+      arabicText,
+      translatedText: primaryTrans,
       translations: texts,
       collection: collectionKey,
       sectionId,
       sectionName,
       bookTitle: first.payload.metadata.name ?? collection?.name ?? collectionKey,
       grades: h.grades ?? [],
+      categories,
     };
   });
 }

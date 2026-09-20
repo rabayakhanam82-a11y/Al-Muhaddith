@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSettings } from "../state/SettingsContext";
 import { TRANSLATION_LANGUAGES } from "../data/constants";
 import { XIcon, LanguageIcon } from "./icons";
+import {
+  downloadAllCollections,
+  downloadCollection,
+  removeCollectionFromOffline,
+  getOfflineSummary,
+  type OfflineSummary,
+} from "../data/offlineManager";
 
-/** Translation Settings: multi-language reader configuration controls. */
+/** Translation Settings: multi-language reader configuration & offline storage manager. */
 export function SettingsPanel({
   open,
   onClose,
@@ -23,6 +30,63 @@ export function SettingsPanel({
     setLayoutMode,
   } = useSettings();
   const [query, setQuery] = useState("");
+  const [offlineStatus, setOfflineStatus] = useState<OfflineSummary | null>(null);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadMsg, setDownloadMsg] = useState("");
+
+  const refreshOffline = async () => {
+    try {
+      const status = await getOfflineSummary(langCodes);
+      setOfflineStatus(status);
+    } catch {
+      // offline status non-fatal
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      void refreshOffline();
+    }
+  }, [open, langCodes]);
+
+  const handleDownloadAll = async () => {
+    setDownloading(true);
+    try {
+      await downloadAllCollections(langCodes, (_colName, pct, stepMsg) => {
+        setDownloadMsg(`[${pct}%] ${stepMsg}`);
+      });
+      await refreshOffline();
+      setDownloadMsg("All canonical collections downloaded for offline use!");
+    } catch (e: any) {
+      setDownloadMsg(`Download failed: ${e.message}`);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadSingle = async (collectionKey: string) => {
+    setDownloading(true);
+    try {
+      await downloadCollection(collectionKey, langCodes, (msg, pct) => {
+        setDownloadMsg(`[${pct}%] ${msg}`);
+      });
+      await refreshOffline();
+      setDownloadMsg(`Collection ${collectionKey} saved offline!`);
+    } catch (e: any) {
+      setDownloadMsg(`Download failed: ${e.message}`);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDeleteSingle = async (collectionKey: string) => {
+    try {
+      await removeCollectionFromOffline(collectionKey, langCodes);
+      await refreshOffline();
+    } catch (e: any) {
+      setDownloadMsg(`Removal failed: ${e.message}`);
+    }
+  };
 
   const languages = TRANSLATION_LANGUAGES.filter((l) =>
     l.label.toLowerCase().includes(query.toLowerCase()),
@@ -47,12 +111,83 @@ export function SettingsPanel({
       >
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-parchment">
-            Reader Settings
+            Settings & Offline
           </h2>
           <button onClick={onClose} className="btn-ghost" aria-label="Close settings">
             <XIcon />
           </button>
         </div>
+
+        {/* Offline Database Section */}
+        <section className="mb-8 rounded-xl border border-hairline bg-ink-raised/60 p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
+              Offline Storage (PWA)
+            </p>
+            {offlineStatus && (
+              <span className="rounded bg-emerald/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-light">
+                {offlineStatus.totalCachedEditions} cached ({offlineStatus.estimatedStorageMb} MB)
+              </span>
+            )}
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-stone-mid">
+            Download complete Hadith databases (Arabic + active translations) to your device for 100% offline access without internet.
+          </p>
+
+          <button
+            onClick={handleDownloadAll}
+            disabled={downloading}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gold bg-gold-faint px-3 py-2 text-xs font-semibold text-gold transition-colors hover:bg-gold hover:text-ink disabled:opacity-50"
+          >
+            {downloading ? "Downloading Database..." : "Download All Collections Offline"}
+          </button>
+
+          {downloadMsg && (
+            <p className="mt-2 text-[11px] text-parchment/90 animate-pulse font-mono">
+              {downloadMsg}
+            </p>
+          )}
+
+          {offlineStatus && (
+            <div className="mt-4 space-y-1.5 border-t border-hairline pt-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-mid">
+                Collection Status
+              </p>
+              {offlineStatus.collections.map((c) => {
+                return (
+                  <div
+                    key={c.key}
+                    className="flex items-center justify-between py-1 text-xs"
+                  >
+                    <span className="text-parchment">{c.name}</span>
+                    <div className="flex items-center gap-2">
+                      {c.isDownloaded ? (
+                        <>
+                          <span className="text-[10px] text-emerald-light font-medium">Offline Ready</span>
+                          <button
+                            onClick={() => handleDeleteSingle(c.key)}
+                            className="text-[10px] text-crimson hover:underline"
+                            title="Delete offline cache for this book"
+                          >
+                            Remove
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => handleDownloadSingle(c.key)}
+                          disabled={downloading}
+                          className="rounded border border-hairline px-2 py-0.5 text-[10px] text-stone-mid hover:border-gold hover:text-gold disabled:opacity-50"
+                        >
+                          Download
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
         {/* Typography scales */}
         <section className="mb-8">

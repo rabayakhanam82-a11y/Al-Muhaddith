@@ -35,6 +35,14 @@ export interface TranslationText {
   text: string;
 }
 
+export interface HadithCategory {
+  id: string;
+  title: string;
+  arabicTitle?: string;
+  color?: string;
+  parentId?: string | null;
+}
+
 /** Fully hydrated node: Arabic zipped onto one or more translations. */
 export interface HadithNode {
   id: string;
@@ -49,6 +57,8 @@ export interface HadithNode {
   sectionName: string;
   bookTitle: string;
   grades: GradeEntry[];
+  /** Categories linked from HadeethEnc taxonomy via Arabic and canonical matching. */
+  categories?: HadithCategory[];
 }
 
 export type LayoutMode = "stacked" | "split";
