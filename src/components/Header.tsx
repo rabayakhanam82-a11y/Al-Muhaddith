@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { SearchIcon, SettingsIcon, MenuIcon } from "./icons";
 
 import logoSvg from "../assets/logo.svg?raw";
@@ -29,6 +30,26 @@ export function Header({
   onToggleMenu: () => void;
   menuOpen: boolean;
 }) {
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      setDeferredPrompt(null);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-ink-base/95">
       <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
@@ -75,6 +96,16 @@ export function Header({
             className="input-plain pl-10"
           />
         </div>
+
+        {deferredPrompt && (
+          <button
+            onClick={handleInstall}
+            className="flex items-center gap-1.5 rounded-lg border border-gold bg-gold-faint px-3 py-1.5 text-xs font-semibold text-gold transition hover:bg-gold hover:text-ink"
+            title="Install app on device"
+          >
+            <span>Install</span>
+          </button>
+        )}
 
         <button
           onClick={onToggleSettings}
